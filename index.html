@@ -404,6 +404,11 @@ footer { color: var(--muted); font-size: 13px; padding-block: 18px 34px; border-
 footer p { margin: 0 0 6px; max-width: 40em; }
 .loading { color: var(--muted); font-size: 14px; }
 
+/* start page: just the title and the search field, centred */
+body.home .masthead { padding-top: max(24px, calc(34vh - 90px)); }
+body.home .brand { justify-content: center; }
+body.home .chiprow { justify-content: center; }
+body.home footer { display: none; }
 @media (min-width: 700px) {
   .masthead { padding-block: 34px 8px; }
   .dest h2 { font-size: 30px; }
@@ -462,15 +467,9 @@ footer p { margin: 0 0 6px; max-width: 40em; }
   <div id="chips" class="chips"></div>
   <main id="result" aria-live="polite"></main>
 
-  <section class="how" aria-labelledby="howTitle">
-    <h2 id="howTitle">Så funkar det</h2>
-    <p>Varje station har uppgångar i olika ändar av perrongen. Välj ett mål, så räknar vi ut vilken uppgång som ligger närmast och var den finns i förhållande till tågets färdriktning. Sitter du längst fram eller bak kliver du av precis vid trappan.</p>
-    <p>Kortare tåg stannar ofta mitt på perrongen. Rådet gäller ändå: gå till samma ände av tåget.</p>
-  </section>
 
   <footer>
-    <p>Stationslägen och uppgångar kommer från OpenStreetMap och är kontrollerade mot bland annat Wikipedia. Ombyggnader och stängda uppgångar kan göra att något inte stämmer – kolla skyltarna på plats.</p>
-    <p>Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL eller Region Stockholm.</p>
+    <p>Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.</p>
   </footer>
 </div>
 
@@ -763,6 +762,7 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       }
     }
     result.innerHTML = html;
+    document.body.classList.toggle("home", !current);
     revealSelected(result);
   }
   function revealSelected(root) {
@@ -1100,6 +1100,7 @@ footer p { margin: 0 0 6px; max-width: 40em; }
   window.addEventListener("hashchange", function () { routeFromHash(true); });
 
   // ------------------------------------------------------------ start
+  document.body.classList.add("home");
   renderChips();
   if (!routeFromHash(false)) {
     /* start with just the search field */
