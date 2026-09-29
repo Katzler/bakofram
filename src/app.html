@@ -126,13 +126,27 @@ a { color: inherit; }
 .masthead { padding-block: 18px 6px; }
 .masthead { position: relative; }
 .lang {
-  position: absolute; top: 12px; right: 0;
-  min-width: 44px; min-height: 36px; padding: 4px 10px;
-  border: 1px solid var(--line-2); border-radius: 999px;
-  background: var(--surface); color: var(--ink-2);
-  font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .04em;
+  position: absolute; top: 10px; right: 0; z-index: 1;
+  display: grid; grid-template-columns: 1fr 1fr;
+  padding: 3px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line-2);
+  box-shadow: var(--shadow);
 }
-.lang:active { background: var(--surface-2); }
+.lang button {
+  position: relative; z-index: 1;
+  min-width: 44px; min-height: 34px; padding: 0 12px;
+  border: 0; border-radius: 999px; background: transparent;
+  font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .05em;
+  color: var(--muted); transition: color .2s ease;
+}
+.lang button[aria-checked="true"] { color: var(--accent-ink); }
+.lang-thumb {
+  position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px);
+  border-radius: 999px; background: var(--accent);
+  transition: transform .22s cubic-bezier(.3,.7,.3,1);
+}
+.lang[data-lang="en"] .lang-thumb { transform: translateX(100%); }
+@media (prefers-reduced-motion: reduce) { .lang-thumb, .lang button { transition: none; } }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand svg { flex: none; width: 46px; height: 20px; }
 .brand h1 {
@@ -426,7 +440,11 @@ body.home footer { display: none; }
 
 <div class="wrap">
   <header class="masthead">
-    <button type="button" id="langBtn" class="lang" aria-label="Switch to English">EN</button>
+    <div class="lang" role="radiogroup" aria-label="Språk / Language">
+      <span class="lang-thumb" aria-hidden="true"></span>
+      <button type="button" role="radio" data-lang="sv" aria-checked="true" aria-label="Svenska">SV</button>
+      <button type="button" role="radio" data-lang="en" aria-checked="false" aria-label="English">EN</button>
+    </div>
     <div class="brand">
       <svg viewBox="0 0 46 20" aria-hidden="true">
         <rect x="1" y="3" width="13" height="13" rx="3" fill="var(--train)"/>
@@ -477,7 +495,7 @@ body.home footer { display: none; }
   "use strict";
   // ------------------------------------------------------------ language
   function store0(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  var LANG = store0("feb.lang") || (/^sv|^nb|^no|^da/i.test(navigator.language || "") ? "sv" : "en");
+  var LANG = store0("feb.lang") === "en" ? "en" : "sv"; // Swedish unless the viewer picked English
   var STR = {
     sv: { title: "Fram eller bak?", ph: "Vart ska du? T.ex. Södersjukhuset", clear: "Rensa sökningen", sugg: "Sökförslag",
       foot: "Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.",
@@ -542,8 +560,9 @@ body.home footer { display: none; }
     document.getElementById("clearBtn").setAttribute("aria-label", t("clear"));
     document.getElementById("suggest").setAttribute("aria-label", t("sugg"));
     document.getElementById("footText").textContent = t("foot");
-    var lb = document.getElementById("langBtn");
-    lb.textContent = t("langBtn"); lb.setAttribute("aria-label", t("langAria"));
+    var lg = document.querySelector(".lang");
+    lg.setAttribute("data-lang", LANG);
+    Array.prototype.forEach.call(lg.querySelectorAll("button"), function (b) { b.setAttribute("aria-checked", b.getAttribute("data-lang") === LANG ? "true" : "false"); });
   }
   applyStatic();
 
@@ -1169,8 +1188,10 @@ body.home footer { display: none; }
   }
 
   window.addEventListener("hashchange", function () { routeFromHash(true); });
-  document.getElementById("langBtn").addEventListener("click", function () {
-    LANG = LANG === "sv" ? "en" : "sv";
+  document.querySelector(".lang").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-lang]");
+    if (!b || b.getAttribute("data-lang") === LANG) return;
+    LANG = b.getAttribute("data-lang");
     store0("feb.lang", LANG);
     applyStatic();
     if (current) { var keepSel = selState, keepOpen = openState; render(); selState = keepSel; openState = keepOpen; }
