@@ -889,6 +889,7 @@ body.home footer { display: none; }
       else if (m === qt.length) s += 30;
       s += m * 6;
       s -= Math.min(30, e.f.length * 0.2);
+      if (e.k === "st") s -= 90; // the user is looking for a destination: places first, then stations
       res.push({ e: e, s: s });
     }
     res.sort(function (a, b) { return b.s - a.s; });
