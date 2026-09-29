@@ -724,7 +724,6 @@ footer p { margin: 0 0 6px; max-width: 40em; }
     var e = g.ex[sel];
     var meta = [];
     if (e.h === 1) meta.push('<span class="pill">Hiss</span>');
-    if (e.o) meta.push("<span>" + esc(e.o) + "</span>");
     var p = e.p[0];
     meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">Visa uppgången på kartan</a>');
     html += '<div class="meta-row">' + meta.join("") + "</div>";
