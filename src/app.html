@@ -124,6 +124,15 @@ a { color: inherit; }
 
 /* ---------- masthead */
 .masthead { padding-block: 18px 6px; }
+.masthead { position: relative; }
+.lang {
+  position: absolute; top: 12px; right: 0;
+  min-width: 44px; min-height: 36px; padding: 4px 10px;
+  border: 1px solid var(--line-2); border-radius: 999px;
+  background: var(--surface); color: var(--ink-2);
+  font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .04em;
+}
+.lang:active { background: var(--surface-2); }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand svg { flex: none; width: 46px; height: 20px; }
 .brand h1 {
@@ -417,6 +426,7 @@ body.home footer { display: none; }
 
 <div class="wrap">
   <header class="masthead">
+    <button type="button" id="langBtn" class="lang" aria-label="Switch to English">EN</button>
     <div class="brand">
       <svg viewBox="0 0 46 20" aria-hidden="true">
         <rect x="1" y="3" width="13" height="13" rx="3" fill="var(--train)"/>
@@ -427,7 +437,7 @@ body.home footer { display: none; }
         <rect x="33" y="6" width="7" height="4" rx="1" fill="var(--accent-ink)" opacity=".35"/>
         <rect x="0" y="18" width="46" height="2" rx="1" fill="var(--edge)"/>
       </svg>
-      <h1>Fram eller bak?</h1>
+      <h1 id="appTitle">Fram eller bak?</h1>
     </div>
   </header>
 </div>
@@ -455,7 +465,7 @@ body.home footer { display: none; }
 
 
   <footer>
-    <p>Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.</p>
+    <p id="footText">Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.</p>
   </footer>
 </div>
 
@@ -465,6 +475,78 @@ body.home footer { display: none; }
 <script>
 (function () {
   "use strict";
+  // ------------------------------------------------------------ language
+  function store0(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  var LANG = store0("feb.lang") || (/^sv|^nb|^no|^da/i.test(navigator.language || "") ? "sv" : "en");
+  var STR = {
+    sv: { title: "Fram eller bak?", ph: "Vart ska du? T.ex. Södersjukhuset", clear: "Rensa sökningen", sugg: "Sökförslag",
+      foot: "Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.",
+      f2: "längst fram", f1: "en bit fram", m: "i mitten", b1: "en bit bak", b2: "längst bak", sit: "Sitt",
+      from: "Från", to: "mot", via: "Gå ut via", unreachTop: "Uppgången", unreach: "nås inte härifrån",
+      exit: "Uppgång", toDest: "till målet", other: "Annan uppgång", pick: "Välj uppgång", elevator: "Hiss", map: "Visa uppgången på kartan",
+      low: "Osäkert underlag för den här stationen. Titta efter skyltarna på perrongen.",
+      auto: "Uträknat från kartdata och ännu inte kontrollerat mot andra källor.",
+      walk: "min gång", approx: "ca", station: "Station", pickHelp: "Välj uppgång för att se var du ska sitta.",
+      none: "Hittade ingen station i närheten.", far: "Det är en bit att gå från närmaste station",
+      djur: "Djurgården nås lättast med spårvagn 7, buss 67 eller färjan från Slussen.",
+      recent: "Senaste", recentAria: "Senaste sökningar", loading: "Laddar platser…", loadingMore: "Laddar fler platser…",
+      notFound: "Hittade inget. Prova ett stationsnamn, en gata eller ett ställe.", near: "nära", street: "Gata", address: "Adress", place: "Plats",
+      langBtn: "EN", langAria: "Switch to English" },
+    en: { title: "Front or back?", ph: "Where to? E.g. Vasa Museum", clear: "Clear search", sugg: "Suggestions",
+      foot: "Map data © OpenStreetMap contributors (ODbL). Not affiliated with SL. Exits can change – check the signs on site.",
+      f2: "at the very front", f1: "towards the front", m: "in the middle", b1: "towards the back", b2: "at the very back", sit: "Sit",
+      from: "From", to: "towards", via: "Exit via", unreachTop: "This exit", unreach: "not reachable from here",
+      exit: "Exit", toDest: "to your destination", other: "Other exit", pick: "Choose exit", elevator: "Elevator", map: "Show the exit on a map",
+      low: "Uncertain data for this station. Look for the signs on the platform.",
+      auto: "Calculated from map data, not yet checked against other sources.",
+      walk: "min walk", approx: "approx.", station: "Station", pickHelp: "Choose an exit to see where to sit.",
+      none: "No station found nearby.", far: "It is quite a walk from the nearest station",
+      djur: "Djurgården is easiest to reach by tram 7, bus 67 or the ferry from Slussen.",
+      recent: "Recent", recentAria: "Recent searches", loading: "Loading places…", loadingMore: "Loading more places…",
+      notFound: "Nothing found. Try a station, a street or a place.", near: "near", street: "Street", address: "Address", place: "Place",
+      langBtn: "SV", langAria: "Byt till svenska" }
+  };
+  function t(k) { return STR[LANG][k]; }
+  var SYS_EN = { metro: "Metro", pendel: "Commuter train", roslag: "Roslagsbanan (local train)", saltsjo: "Saltsjöbanan (local train)",
+    tvar: "Tvärbanan (light rail)", lidingo: "Lidingöbanan (light rail)", nockeby: "Nockebybanan (tram)" };
+  function sysName(s) { return LANG === "en" ? SYS_EN[s] : SYS[s].name; }
+  var LINE_EN = { "Blå linjen": "Blue line", "Röda linjen": "Red line", "Gröna linjen": "Green line" };
+  var CAT_EN = { "Område": "Area", "Universitet": "University", "Restaurang": "Restaurant", "Idrottsanläggning": "Sports centre", "Skola": "School",
+    "Konferens": "Conference centre", "Kyrka": "Church", "Hotell": "Hotel", "Sevärdhet": "Attraction", "Högskola": "College", "Bank": "Bank",
+    "Vandrarhem": "Hostel", "Historisk plats": "Historic site", "Snabbmat": "Fast food", "Museum": "Museum", "Teater": "Theatre", "Pub": "Pub",
+    "Mataffär": "Supermarket", "Apotek": "Pharmacy", "Butik": "Shop", "Bibliotek": "Library", "Djurpark": "Zoo", "Kafé": "Café", "Service": "Service",
+    "Kontor": "Office", "Varuhus": "Department store", "Kulturhus": "Arts centre", "Ambassad": "Embassy", "Fritid": "Leisure", "Marina": "Marina",
+    "Medborgarhus": "Community centre", "Sjukhus": "Hospital", "Cykel": "Bike shop", "Brandstation": "Fire station", "Evenemang": "Event venue",
+    "Galleri": "Gallery", "Motell": "Motel", "Utsiktsplats": "Viewpoint", "Vårdcentral": "Clinic", "Domstol": "Court", "Närbutik": "Convenience store",
+    "Bilhandel": "Car dealer", "Blommor": "Florist", "Vård": "Healthcare", "Gym": "Gym", "Torg": "Square", "Biograf": "Cinema", "Ö": "Island",
+    "Byggvaruhus": "DIY store", "Turism": "Tourism", "Sport": "Sports shop", "Polis": "Police", "Bageri": "Bakery", "Klädbutik": "Clothes shop",
+    "Optiker": "Optician", "Förskola": "Preschool", "Post": "Post office", "Köpcentrum": "Shopping centre", "Byggnad": "Building", "Bar": "Bar",
+    "Nattklubb": "Nightclub", "Frisör": "Hairdresser", "Systembolaget": "Liquor store", "Kiosk": "Kiosk", "Hantverk": "Craft", "Möbler": "Furniture",
+    "Biluthyrning": "Car rental", "Veterinär": "Vet", "Elektronik": "Electronics", "Glass": "Ice cream", "Bokhandel": "Bookshop", "Idrott": "Sports",
+    "Omsorg": "Care home", "Bilverkstad": "Car repair", "Mässa": "Exhibition centre", "Skönhet": "Beauty", "Bowling": "Bowling", "Mobil": "Phone shop",
+    "Tandläkare": "Dentist", "Järnhandel": "Hardware store", "Smycken": "Jewellery", "Skor": "Shoes", "Myndighet": "Government office",
+    "Trafikskola": "Driving school", "Dans": "Dance", "Flygplats": "Airport", "Båt": "Ferry terminal", "Studio": "Studio", "Konserthus": "Concert hall",
+    "Synagoga": "Synagogue", "Pensionat": "Guest house", "Moské": "Mosque", "Förening": "Club", "Minigolf": "Mini golf", "Badhus": "Swimming hall",
+    "Kommunhus": "Town hall", "Utbildning": "Education", "Religiös plats": "Place of worship", "Lägenhetshotell": "Apartment hotel", "Tempel": "Temple",
+    "Nöje": "Entertainment", "Musikskola": "Music school", "Idrottshall": "Sports hall", "Park": "Park", "Forskning": "Research", "Anstalt": "Prison",
+    "Anläggning": "Resort", "Ishall": "Ice rink", "Kyrkogård": "Cemetery", "Arena": "Arena", "Bad": "Swimming", "Golfbana": "Golf course",
+    "Camping": "Campsite", "Naturreservat": "Nature reserve", "Nöjespark": "Amusement park", "Bussterminal": "Bus terminal", "Akvarium": "Aquarium",
+    "Badplats": "Beach", "Gata": "Street", "Adress": "Address" };
+  function catName(c) { return LANG === "en" ? (CAT_EN[c] || c) : c; }
+  function applyStatic() {
+    document.documentElement.lang = LANG;
+    document.title = t("title");
+    document.getElementById("appTitle").textContent = t("title");
+    var q = document.getElementById("q");
+    q.placeholder = t("ph"); q.setAttribute("aria-label", t("ph"));
+    document.getElementById("clearBtn").setAttribute("aria-label", t("clear"));
+    document.getElementById("suggest").setAttribute("aria-label", t("sugg"));
+    document.getElementById("footText").textContent = t("foot");
+    var lb = document.getElementById("langBtn");
+    lb.textContent = t("langBtn"); lb.setAttribute("aria-label", t("langAria"));
+  }
+  applyStatic();
+
   var DATA = JSON.parse(document.getElementById("stations-data").textContent);
   var STATIONS = DATA.stations;
   var EXAMPLE = DATA.example || null;
@@ -509,7 +591,8 @@ body.home footer { display: none; }
   }
   function fmtDist(m) {
     if (m < 1000) return (m < 100 ? Math.max(10, Math.round(m / 10) * 10) : Math.round(m / 10) * 10) + " m";
-    return (m / 1000).toFixed(1).replace(".", ",") + " km";
+    var km = (m / 1000).toFixed(1);
+    return (LANG === "sv" ? km.replace(".", ",") : km) + " km";
   }
   // straight-line metres -> estimated walking metres / minutes (streets are rarely straight)
   var DETOUR = 1.25;
@@ -524,11 +607,8 @@ body.home footer { display: none; }
 
   // ------------------------------------------------------------ answers
   function answerFor(trel) {
-    if (trel >= 0.55) return { text: "längst fram", key: "f2" };
-    if (trel >= 0.2) return { text: "en bit fram", key: "f1" };
-    if (trel > -0.2) return { text: "i mitten", key: "m" };
-    if (trel > -0.55) return { text: "en bit bak", key: "b1" };
-    return { text: "längst bak", key: "b2" };
+    var k = trel >= 0.55 ? "f2" : trel >= 0.2 ? "f1" : trel > -0.2 ? "m" : trel > -0.55 ? "b1" : "b2";
+    return { text: t(k), key: k };
   }
   var X0 = 22, X1 = 298;
   function xOf(t) { t = Math.max(-1, Math.min(1, t)); return X0 + (t + 1) / 2 * (X1 - X0); }
@@ -576,7 +656,7 @@ body.home footer { display: none; }
   var ISLANDS = [
     { test: function (la, lo) { return la > 59.315 && la < 59.3318 && lo > 18.088 && lo < 18.15; },
       bridges: [[59.3319, 18.0928], [59.3307, 18.1275]],
-      tip: "Djurgården nås lättast med spårvagn 7, buss 67 eller färjan från Slussen." },
+      tip: "djur" },
     { test: function (la, lo) { return la > 59.3205 && la < 59.3287 && lo > 18.0775 && lo < 18.0935; },
       bridges: [[59.3278, 18.0797]], tip: "" }
   ];
@@ -652,7 +732,7 @@ body.home footer { display: none; }
       // this direction's platform has its own exit: use the one closest to the chosen exit
       var alt = d.x[0];
       d.x.forEach(function (i) { if (Math.abs(g.ex[i].t - g.ex[sel].t) < Math.abs(g.ex[alt].t - g.ex[sel].t)) alt = i; });
-      via = '<div class="dir-to">Gå ut via ' + esc(g.ex[alt].n) + "</div>";
+      via = '<div class="dir-to">' + t("via") + " " + esc(g.ex[alt].n) + "</div>";
       sel = alt; reach = true;
     }
     var e = g.ex[sel];
@@ -661,12 +741,12 @@ body.home footer { display: none; }
     var lines = d.l.map(badge).join("");
     var to = d.to.join(" · ");
     var html = '<li class="dir"><div class="dir-top"><div class="dir-text">' +
-      '<div class="dir-from">Från <b>' + esc(d.from) + '</b><span class="dir-lines">' + lines + "</span></div>" +
-      '<div class="dir-to">mot ' + esc(to) + "</div>" + via + "</div>";
+      '<div class="dir-from">' + t("from") + ' <b>' + esc(d.from) + '</b><span class="dir-lines">' + lines + "</span></div>" +
+      '<div class="dir-to">' + t("to") + " " + esc(to) + "</div>" + via + "</div>";
     if (reach) {
-      html += '<div class="answer"><span class="verb">Sitt</span><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
+      html += '<div class="answer"><span class="verb">' + t("sit") + '</span><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
     } else {
-      html += '<div class="answer"><span class="verb">Uppgången</span><span class="ans" style="font-size:16px">nås inte härifrån</span></div></div>';
+      html += '<div class="answer"><span class="verb">' + t("unreachTop") + '</span><span class="ans" style="font-size:16px">' + t("unreach") + "</span></div></div>";
     }
     return html + "</li>";
   }
@@ -686,41 +766,41 @@ body.home footer { display: none; }
     var html = '<div class="group" data-key="' + esc(key) + '">';
     if (st.g.length > 1) {
       var lname = LINE_NAME[g.lines[0]];
-      html += '<div class="group-title">' + g.lines.map(badge).join("") + (lname && st.s === "metro" ? " " + (g.lines.every(function (l) { return LINE_NAME[l] === lname; }) ? lname : "Perrong " + (gi + 1)) : "") + "</div>";
+      html += '<div class="group-title">' + g.lines.map(badge).join("") + (lname && st.s === "metro" ? " " + (g.lines.every(function (l) { return LINE_NAME[l] === lname; }) ? (LANG === "en" ? LINE_EN[lname] : lname) : "") : "") + "</div>";
     }
     var collapsed = dists && g.ex.length > 1 && !openState[key];
     if (collapsed) {
-      html += '<div class="bestexit"><span class="pill">Uppgång: <b>' + esc(g.ex[sel].n) + '</b></span> <span class="pill">' +
-        fmtDist(walkM(dists[sel])) + ' till målet</span> <button type="button" class="linkbtn more-exits">Annan uppgång</button></div>';
+      html += '<div class="bestexit"><span class="pill">' + t("exit") + ': <b>' + esc(g.ex[sel].n) + '</b></span> <span class="pill">' +
+        fmtDist(walkM(dists[sel])) + " " + t("toDest") + '</span> <button type="button" class="linkbtn more-exits">' + t("other") + "</button></div>";
     } else if (g.ex.length > 1) {
-      html += '<div class="exitpick" role="radiogroup" aria-label="Välj uppgång">';
+      html += '<div class="exitpick" role="radiogroup" aria-label="' + t("pick") + '">';
       g.ex.forEach(function (e, i) {
-        var sub = dists ? fmtDist(walkM(dists[i])) + " till målet" : (e.h === 1 ? "Hiss" : "");
+        var sub = dists ? fmtDist(walkM(dists[i])) + " " + t("toDest") : (e.h === 1 ? t("elevator") : "");
         html += '<button type="button" class="xchip" role="radio" aria-checked="' + (i === sel) + '" data-i="' + i + '">' +
           '<span><span class="xname">' + esc(e.n) + "</span>" +
           (sub ? '<span class="xdist">' + esc(sub) + "</span>" : "") + "</span></button>";
       });
       html += "</div>";
     } else if (g.ex.length === 1) {
-      html += '<div class="group-title" style="margin-bottom:4px"><span class="pill">Uppgång: <b>' + esc(g.ex[0].n) + "</b></span>" +
-        (dists ? ' <span class="pill">' + fmtDist(walkM(dists[0])) + " till målet</span>" : "") + "</div>";
+      html += '<div class="group-title" style="margin-bottom:4px"><span class="pill">' + t("exit") + ": <b>" + esc(g.ex[0].n) + "</b></span>" +
+        (dists ? ' <span class="pill">' + fmtDist(walkM(dists[0])) + " " + t("toDest") + "</span>" : "") + "</div>";
     }
     html += '<ul class="dirs">' + g.d.map(function (d) { return dirRow(g, d, sel); }).join("") + "</ul>";
     var e = g.ex[sel];
     var meta = [];
-    if (e.h === 1) meta.push('<span class="pill">Hiss</span>');
+    if (e.h === 1) meta.push('<span class="pill">' + t("elevator") + "</span>");
     var p = e.p[0];
-    meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">Visa uppgången på kartan</a>');
+    meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">' + t("map") + "</a>");
     html += '<div class="meta-row">' + meta.join("") + "</div>";
-    if (st.c === "low") html += '<p class="warn">Osäkert underlag för den här stationen. Titta efter skyltarna på perrongen.</p>';
-    else if (st.c === "auto") html += '<p class="warn">Uträknat från kartdata och ännu inte kontrollerat mot andra källor.</p>';
+    if (st.c === "low") html += '<p class="warn">' + t("low") + "</p>";
+    else if (st.c === "auto") html += '<p class="warn">' + t("auto") + "</p>";
     return html + "</div>";
   }
 
   function cardHTML(st, dest, dist) {
     var head = '<div class="card-head"><span class="mode" style="background:' + stationColor(st) + '">' + SYS[st.s].letter + "</span>" +
-      '<div class="card-title"><h3>' + esc(st.n) + '</h3><div class="card-meta">' + SYS[st.s].name + " " + st.lines.map(badge).join("") + "</div></div>";
-    if (dist != null) head += '<div class="walk"><strong>' + fmtDist(walkM(dist)) + "</strong><span>ca " + walkMin(dist) + " min gång</span></div>";
+      '<div class="card-title"><h3>' + esc(st.n) + '</h3><div class="card-meta">' + sysName(st.s) + " " + st.lines.map(badge).join("") + "</div></div>";
+    if (dist != null) head += '<div class="walk"><strong>' + fmtDist(walkM(dist)) + "</strong><span>" + t("approx") + " " + walkMin(dist) + " " + t("walk") + "</span></div>";
     head += "</div>";
     var body = st.g.map(function (g, gi) { return groupHTML(st, gi, dest); }).join("");
     return '<section class="card" data-st="' + esc(st.id) + '">' + head + body + "</section>";
@@ -732,18 +812,19 @@ body.home footer { display: none; }
     var html = "";
     if (current.type === "station") {
       var st = current.st;
-      html += '<div class="dest"><div class="kicker">Station</div><h2>' + esc(st.n) + '</h2><div class="dest-sub">Välj uppgång för att se var du ska sitta.</div></div>';
+      html += '<div class="dest"><div class="kicker">' + t("station") + "</div><h2>" + esc(st.n) + '</h2><div class="dest-sub">' + t("pickHelp") + "</div></div>";
       html += '<div class="cards">' + cardHTML(st, null, null) + "</div>";
     } else {
       var pl = current.place;
-      html += '<div class="dest"><div class="kicker">' + esc(pl.cat || "Plats") + "</div><h2>" + esc(pl.name) + "</h2>" + (pl.sub ? '<div class="dest-sub">' + esc(pl.sub) + "</div>" : "") + "</div>";
+      html += '<div class="dest"><div class="kicker">' + esc(pl.cat ? catName(pl.cat) : t("place")) + "</div><h2>" + esc(pl.name) + "</h2>" + (pl.sub ? '<div class="dest-sub">' + esc(pl.sub) + "</div>" : "") + "</div>";
       var near = nearbyStations(pl.lat, pl.lon);
       if (!near.pick.length) {
-        html += '<p class="empty">Hittade ingen station i närheten.</p>';
+        html += '<p class="empty">' + t("none") + "</p>";
       } else {
         var far = near.pick[0].d > 1300;
         var isl = islandOf(pl.lat, pl.lon);
-        if (far) html += '<p class="warn">Det är en bit att gå från närmaste station (ca ' + fmtDist(walkM(near.pick[0].d)) + ")." + (isl && isl.tip ? " " + isl.tip : "") + "</p>";
+        if (far) html += '<p class="warn">' + t("far") + " (" + t("approx") + " " + fmtDist(walkM(near.pick[0].d)) + ")." + (isl && isl.tip ? " " + t(isl.tip) : "") + "</p>";
+        else if (isl && isl.tip) html += '<p class="warn">' + t(isl.tip) + "</p>";
         html += '<div class="cards">' + near.pick.map(function (r) { return cardHTML(r.st, pl, r.d); }).join("") + "</div>";
       }
     }
@@ -797,7 +878,7 @@ body.home footer { display: none; }
   function toks(s) { return fold(s).split(" ").filter(Boolean); }
   STATIONS.forEach(function (st) {
     var extra = (st.al || []).join(" ");
-    IDX.push({ k: "st", name: st.n, sub: SYS[st.s].name + " · " + st.lines.join(" "), f: fold(st.n), af: (st.al || []).map(fold), nt: toks(st.n + " " + extra), xt: toks(SYS[st.s].name + " station"), w: st.s === "metro" || st.s === "pendel" ? 118 : 108, st: st });
+    IDX.push({ k: "st", name: st.n, f: fold(st.n), af: (st.al || []).map(fold), nt: toks(st.n + " " + extra), xt: toks(SYS[st.s].name + " " + SYS_EN[st.s] + " station"), w: st.s === "metro" || st.s === "pendel" ? 118 : 108, st: st });
   });
   var PL = null, ADDR = null, ADDR_KEYS = null, placesState = "idle";
   function loadPlaces() {
@@ -809,12 +890,11 @@ body.home footer { display: none; }
       var L0 = d.lat0, O0 = d.lon0;
       d.p.forEach(function (p) {
         var area = p[4] >= 0 ? areas[p[4]] : "";
-        var sub = cats[p[1]] + (p[5] ? " · " + p[5] : "") + (area ? " · nära " + area : "");
-        IDX.push({ k: "p", name: p[0], cat: cats[p[1]], sub: sub, f: fold(p[0]), af: p[6] ? p[6].split(";").map(fold) : null, nt: toks(p[0] + " " + (p[6] || "")), xt: toks(cats[p[1]] + " " + area + " " + (p[5] || "")), w: p[7], lat: L0 + p[2] / 1e5, lon: O0 + p[3] / 1e5, addr: p[5] });
+        IDX.push({ k: "p", name: p[0], cat: cats[p[1]], area: area, f: fold(p[0]), af: p[6] ? p[6].split(";").map(fold) : null, nt: toks(p[0] + " " + (p[6] || "")), xt: toks(cats[p[1]] + " " + (CAT_EN[cats[p[1]]] || "") + " " + area + " " + (p[5] || "")), w: p[7], lat: L0 + p[2] / 1e5, lon: O0 + p[3] / 1e5, addr: p[5] });
       });
       d.s.forEach(function (s) {
         var area = s[1] >= 0 ? areas[s[1]] : "";
-        IDX.push({ k: "s", name: s[0], cat: "Gata", sub: "Gata · nära " + area, f: fold(s[0]), nt: toks(s[0]), xt: toks(area), w: 44, lat: L0 + s[2] / 1e5, lon: O0 + s[3] / 1e5 });
+        IDX.push({ k: "s", name: s[0], cat: "Gata", area: area, f: fold(s[0]), nt: toks(s[0]), xt: toks(area), w: 44, lat: L0 + s[2] / 1e5, lon: O0 + s[3] / 1e5 });
       });
       ADDR = d.a; ADDR_KEYS = Object.keys(d.a).map(function (k) { var parts = k.split("|"); return { k: k, street: parts[0], city: parts[1], f: fold(parts[0]), ct: toks(parts[1] || "") }; });
       placesState = "ready";
@@ -874,7 +954,7 @@ body.home footer { display: none; }
         if (!hit) for (var j = 0; j < list.length; j++) if (parseInt(list[j].n, 10) === parseInt(num, 10)) { hit = list[j]; break; }
         if (!hit) return;
         var area = nearestArea(hit.lat, hit.lon);
-        res.push({ e: { k: "a", name: a.street + " " + hit.n, cat: "Adress", sub: "Adress" + (a.city ? " · " + a.city : "") + " · nära " + area, lat: hit.lat, lon: hit.lon }, s: 200 - (a.f === stf ? 0 : 10) });
+        res.push({ e: { k: "a", name: a.street + " " + hit.n, cat: "Adress", addr: a.city, area: area, lat: hit.lat, lon: hit.lon }, s: 200 - (a.f === stf ? 0 : 10) });
       });
     }
     for (var i = 0; i < IDX.length; i++) {
@@ -921,10 +1001,17 @@ body.home footer { display: none; }
     if (idx < 0 || f.length !== name.length) return esc(name);
     return esc(name.slice(0, idx)) + "<mark>" + esc(name.slice(idx, idx + fq.length)) + "</mark>" + esc(name.slice(idx + fq.length));
   }
+  function subOf(e) {
+    if (e.k === "st") return sysName(e.st.s) + " · " + e.st.lines.join(" ");
+    var parts = [catName(e.cat)];
+    if (e.addr) parts.push(e.addr);
+    if (e.area) parts.push(t("near") + " " + e.area);
+    return parts.join(" · ");
+  }
   function optHTML(e, i, q) {
     var icon = e.k === "st" ? '<span class="mode" style="background:' + stationColor(e.st) + '">' + SYS[e.st.s].letter + "</span>" : '<span class="ico">' + (ICON[e.k] || ICON.p) + "</span>";
     return '<li class="opt" role="option" id="opt-' + i + '" aria-selected="' + (i === active) + '" data-i="' + i + '">' + icon +
-      '<span class="opt-main"><span class="opt-name">' + hl(e.name, q) + '</span><span class="opt-sub">' + esc(e.sub) + "</span></span></li>";
+      '<span class="opt-main"><span class="opt-name">' + hl(e.name, q) + '</span><span class="opt-sub">' + esc(subOf(e)) + "</span></span></li>";
   }
   function showSug(show) {
     sugEl.hidden = !show;
@@ -949,9 +1036,9 @@ body.home footer { display: none; }
     active = opts.length ? 0 : -1;
     var html = opts.map(function (e, i) { return optHTML(e, i, q); }).join("");
     if (!opts.length) {
-      html = '<li class="opt-empty">' + (placesState === "loading" ? "Laddar platser…" : "Hittade inget. Prova ett stationsnamn, en gata eller ett ställe.") + "</li>";
+      html = '<li class="opt-empty">' + (placesState === "loading" ? t("loading") : t("notFound")) + "</li>";
     } else if (placesState === "loading") {
-      html += '<li class="opt-empty loading">Laddar fler platser…</li>';
+      html += '<li class="opt-empty loading">' + t("loadingMore") + "</li>";
     }
     sugEl.innerHTML = html;
     qEl.setAttribute("aria-activedescendant", active >= 0 ? "opt-" + active : "");
@@ -973,11 +1060,8 @@ body.home footer { display: none; }
       current = { type: "station", st: e.st };
       setHash("s-" + e.st.id);
     } else {
-      var sub = e.sub ? e.sub.replace(/ · nära .*$/, "") : "";
-      if (e.cat && sub.indexOf(e.cat) === 0) sub = sub.slice(e.cat.length).replace(/^ · /, "");
-      current = { type: "place", place: { name: e.name, sub: sub, cat: e.cat, lat: e.lat, lon: e.lon } };
-      var area = e.sub && / · nära (.*)$/.exec(e.sub);
-      setHash("q-" + slug(e.name + (e.k !== "a" && area ? " " + area[1] : "")));
+      current = { type: "place", place: { name: e.name, sub: e.addr || "", cat: e.cat, lat: e.lat, lon: e.lon } };
+      setHash("q-" + slug(e.name + (e.k !== "a" && e.area ? " " + e.area : "")));
     }
     if (!opts2.keepInput) qEl.value = e.name;
     clearBtn.hidden = !qEl.value;
@@ -1021,7 +1105,7 @@ body.home footer { display: none; }
   var EXAMPLES = ["Södersjukhuset", "Globen", "Lidl Solna centrum", "Karolinska sjukhuset", "Mall of Scandinavia", "Stockholms universitet", "Odenplan"];
   function pushRecent(e) {
     var r = store("feb.recent") || [];
-    var item = e.k === "st" ? { k: "st", id: e.st.id, name: e.st.n } : { k: e.k, name: e.name, sub: e.sub, cat: e.cat, lat: e.lat, lon: e.lon };
+    var item = e.k === "st" ? { k: "st", id: e.st.id, name: e.st.n } : { k: e.k, name: e.name, addr: e.addr, area: e.area, cat: e.cat, lat: e.lat, lon: e.lon };
     r = r.filter(function (x) { return x.name !== item.name; });
     r.unshift(item);
     store("feb.recent", r.slice(0, 6));
@@ -1030,7 +1114,7 @@ body.home footer { display: none; }
     var r = store("feb.recent") || [];
     var html = "";
     if (r.length) {
-      html += '<div class="chiprow" role="group" aria-label="Senaste sökningar"><span class="chips-label">Senaste</span>';
+      html += '<div class="chiprow" role="group" aria-label="' + t("recentAria") + '"><span class="chips-label">' + t("recent") + "</span>";
       r.forEach(function (x, i) { html += '<button type="button" class="chip" data-recent="' + i + '">' + esc(x.name) + "</button>"; });
       html += "</div>";
     }
@@ -1085,6 +1169,14 @@ body.home footer { display: none; }
   }
 
   window.addEventListener("hashchange", function () { routeFromHash(true); });
+  document.getElementById("langBtn").addEventListener("click", function () {
+    LANG = LANG === "sv" ? "en" : "sv";
+    store0("feb.lang", LANG);
+    applyStatic();
+    if (current) { var keepSel = selState, keepOpen = openState; render(); selState = keepSel; openState = keepOpen; }
+    renderChips();
+    if (!sugEl.hidden) update();
+  });
 
   // ------------------------------------------------------------ start
   document.body.classList.add("home");
