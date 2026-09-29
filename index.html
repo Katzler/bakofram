@@ -776,7 +776,7 @@ body.home footer { display: none; }
     var html = '<li class="dir"><div class="dir-top"><div class="dir-text">' +
       '<div class="dir-from">' + t("toCap") + ' <b>' + esc(to) + '</b><span class="dir-lines">' + lines + "</span></div>" + via + "</div>";
     if (reach) {
-      html += '<div class="answer"><span class="verb">' + t("sit") + '</span><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
+      html += '<div class="answer"><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
     } else {
       html += '<div class="answer"><span class="verb">' + t("unreachTop") + '</span><span class="ans" style="font-size:16px">' + t("unreach") + "</span></div></div>";
     }
@@ -802,12 +802,11 @@ body.home footer { display: none; }
     }
     var collapsed = dists && g.ex.length > 1 && !openState[key];
     if (collapsed) {
-      html += '<div class="bestexit"><span class="pill">' + t("exit") + ': <b>' + esc(g.ex[sel].n) + '</b></span> <span class="pill">' +
-        fmtDist(walkM(dists[sel])) + " " + t("toDest") + '</span> <button type="button" class="linkbtn more-exits">' + t("other") + "</button></div>";
+      html += '<div class="bestexit"><span class="pill">' + t("exit") + ': <b>' + esc(g.ex[sel].n) + "</b></span></div>";
     } else if (g.ex.length > 1) {
       html += '<div class="exitpick" role="radiogroup" aria-label="' + t("pick") + '">';
       g.ex.forEach(function (e, i) {
-        var sub = dists ? fmtDist(walkM(dists[i])) + " " + t("toDest") : (e.h === 1 ? t("elevator") : "");
+        var sub = "";
         html += '<button type="button" class="xchip" role="radio" aria-checked="' + (i === sel) + '" data-i="' + i + '">' +
           '<span><span class="xname">' + esc(e.n) + "</span>" +
           (sub ? '<span class="xdist">' + esc(sub) + "</span>" : "") + "</span></button>";
@@ -815,7 +814,7 @@ body.home footer { display: none; }
       html += "</div>";
     } else if (g.ex.length === 1) {
       html += '<div class="group-title" style="margin-bottom:4px"><span class="pill">' + t("exit") + ": <b>" + esc(g.ex[0].n) + "</b></span>" +
-        (dists ? ' <span class="pill">' + fmtDist(walkM(dists[0])) + " " + t("toDest") + "</span>" : "") + "</div>";
+        "</div>";
     }
     html += '<ul class="dirs">' + g.d.map(function (d) { return dirRow(g, d, sel); }).join("") + "</ul>";
     var e = g.ex[sel];
@@ -823,7 +822,7 @@ body.home footer { display: none; }
     if (e.h === 1) meta.push('<span class="pill">' + t("elevator") + "</span>");
     var p = e.p[0];
     meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">' + t("map") + "</a>");
-    html += '<div class="meta-row">' + meta.join("") + "</div>";
+
     if (st.c === "low") html += '<p class="warn">' + t("low") + "</p>";
     else if (st.c === "auto") html += '<p class="warn">' + t("auto") + "</p>";
     return html + "</div>";
