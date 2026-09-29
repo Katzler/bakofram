@@ -4,8 +4,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1]
 page = open(os.path.join(HERE, "dist", "index.html"), encoding="utf-8").read()
 i = page.index('<div class="wrap">')
-head_extra = """<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+head_extra = """<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png?v=2">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Fram/bak">
 <meta name="apple-mobile-web-app-capable" content="yes">
