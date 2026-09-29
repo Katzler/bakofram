@@ -1,0 +1,1127 @@
+<title>Fram eller bak?</title>
+<meta name="description" content="Sök vart du ska i Stockholm och se var du ska sitta på tunnelbanan och pendeltåget för att kliva av närmast rätt uppgång.">
+<meta name="theme-color" content="#eef2f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d131c" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Familjen+Grotesk:wght@500;600;700&display=swap">
+<style>
+:root {
+  --bg: #eef2f6;
+  --surface: #ffffff;
+  --surface-2: #f5f7fa;
+  --ink: #0f1a2a;
+  --ink-2: #2b3a4f;
+  --muted: #5d6b7e;
+  --line: #d9e0e8;
+  --line-2: #c7d0db;
+  --accent: #f4b400;
+  --accent-soft: #fff3cc;
+  --accent-ink: #1d1600;
+  --focus: #1f6feb;
+  --train: #33445b;
+  --train-win: #aebdd0;
+  --platform: #cfd7e1;
+  --edge: #f4b400;
+  --shadow: 0 1px 2px rgba(15, 26, 42, .06), 0 4px 16px rgba(15, 26, 42, .06);
+  --green: #1f8f4a;
+  --red: #d42a31;
+  --blue: #0f6fb8;
+  --pendel: #d0417f;
+  --roslag: #7f4fa3;
+  --saltsjo: #148a98;
+  --tvar: #d9700f;
+  --lidingo: #9a5a22;
+  --nockeby: #5f7087;
+  --good: #1f8f4a;
+  --radius: 14px;
+  --font-display: "Familjen Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d131c;
+    --surface: #151e2b;
+    --surface-2: #1b2635;
+    --ink: #e8eef6;
+    --ink-2: #c9d3e0;
+    --muted: #97a4b6;
+    --line: #253245;
+    --line-2: #33435a;
+    --accent: #f6c33b;
+    --accent-soft: #3a3014;
+    --accent-ink: #1a1400;
+    --focus: #6aa7ff;
+    --train: #8497b0;
+    --train-win: #2a3a50;
+    --platform: #2c3a4e;
+    --edge: #f6c33b;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    --green: #3fb36b;
+    --red: #f0565c;
+    --blue: #4a9de0;
+    --pendel: #eb6aa3;
+    --roslag: #a67cc8;
+    --saltsjo: #3cb2bf;
+    --tvar: #f0913a;
+    --lidingo: #c98a4f;
+    --nockeby: #8ea0b8;
+    --good: #3fb36b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d131c;
+  --surface: #151e2b;
+  --surface-2: #1b2635;
+  --ink: #e8eef6;
+  --ink-2: #c9d3e0;
+  --muted: #97a4b6;
+  --line: #253245;
+  --line-2: #33435a;
+  --accent: #f6c33b;
+  --accent-soft: #3a3014;
+  --accent-ink: #1a1400;
+  --focus: #6aa7ff;
+  --train: #8497b0;
+  --train-win: #2a3a50;
+  --platform: #2c3a4e;
+  --edge: #f6c33b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  --green: #3fb36b;
+  --red: #f0565c;
+  --blue: #4a9de0;
+  --pendel: #eb6aa3;
+  --roslag: #a67cc8;
+  --saltsjo: #3cb2bf;
+  --tvar: #f0913a;
+  --lidingo: #c98a4f;
+  --nockeby: #8ea0b8;
+  --good: #3fb36b;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+a { color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 8px; }
+
+.wrap { max-width: 640px; margin: 0 auto; padding-inline: 16px; }
+
+/* ---------- masthead */
+.masthead { padding-block: 18px 6px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { flex: none; width: 46px; height: 20px; }
+.brand h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(28px, 7.4vw, 36px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.tagline { margin: 6px 0 0; color: var(--muted); font-size: 15px; max-width: 34em; text-wrap: pretty; }
+
+/* ---------- search */
+.searchbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--bg);
+  padding-block: 10px 10px;
+}
+.searchbar::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -10px; height: 10px;
+  background: linear-gradient(var(--bg), transparent);
+  pointer-events: none;
+}
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 2px solid var(--line-2);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  transition: border-color .15s ease;
+}
+.field:focus-within { border-color: var(--ink); }
+.field .glass { flex: none; width: 22px; height: 22px; margin-left: 14px; color: var(--muted); }
+#q {
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0 8px 0 10px;
+  font-size: 18px;
+  font-family: var(--font-body);
+}
+#q::placeholder { color: var(--muted); opacity: 1; }
+#q::-webkit-search-cancel-button { display: none; }
+.clear {
+  flex: none;
+  width: 48px; height: 48px;
+  margin-right: 4px;
+  border: 0; border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  display: grid; place-items: center;
+}
+.clear:active { background: var(--surface-2); }
+.clear svg { width: 20px; height: 20px; }
+
+.suggest {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  max-height: var(--sug-max, min(60vh, 520px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.opt {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 56px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.opt[aria-selected="true"], .opt:active { background: var(--surface-2); }
+.opt-main { min-width: 0; display: flex; flex-direction: column; }
+.opt-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.opt-name mark { background: none; color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+.opt-sub { color: var(--muted); font-size: 14px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+.opt-empty { padding: 14px 12px; color: var(--muted); }
+.ico {
+  flex: none;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.ico svg { width: 19px; height: 19px; }
+.mode {
+  flex: none;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+  background: var(--ink-2);
+}
+
+/* ---------- chips: one swipeable row per kind */
+.chips { display: grid; gap: 8px; padding-block: 2px 4px; }
+.chiprow { display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+.chiprow::-webkit-scrollbar { display: none; }
+.chips-label { flex: none; font-size: 12.5px; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; }
+.chip {
+  flex: none;
+  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 15px;
+}
+.chip:active { background: var(--surface-2); }
+
+/* ---------- results */
+main { padding-block: 10px 24px; }
+.dest { padding: 6px 2px 12px; }
+.kicker { font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.dest h2 {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.dest .dest-sub { color: var(--muted); margin-top: 2px; }
+.example-note {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: 8px;
+}
+.cards { display: flex; flex-direction: column; gap: 14px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-head { display: flex; align-items: center; gap: 12px; padding: 14px 14px 10px; }
+.card-title { min-width: 0; flex: 1; }
+.card-title h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; color: var(--muted); font-size: 14px; margin-top: 3px; }
+.walk { flex: none; text-align: right; font-variant-numeric: tabular-nums; }
+.walk strong { display: block; font-size: 17px; }
+.walk span { font-size: 13px; color: var(--muted); }
+.badge {
+  display: inline-grid; place-items: center;
+  min-width: 26px; height: 22px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.group { border-top: 1px solid var(--line); padding: 12px 14px 14px; }
+.group:first-of-type { border-top: 0; padding-top: 0; }
+.group-title { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); margin-bottom: 8px; }
+
+.exitpick { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; margin: 0 -2px; scrollbar-width: none; }
+.exitpick::-webkit-scrollbar { display: none; }
+.xchip {
+  flex: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  text-align: left;
+  max-width: 78vw;
+}
+.xchip[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.xchip .letter {
+  flex: none;
+  width: 28px; height: 28px; border-radius: 8px;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  background: var(--surface-2); color: var(--ink);
+  border: 1px solid var(--line-2);
+}
+.xchip[aria-checked="true"] .letter { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.xchip .xname { font-weight: 700; font-size: 15px; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xchip .xdist { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+
+.bestexit { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+.bestexit .pill { font-size: 14px; padding: 4px 10px; }
+.linkbtn { border: 0; background: none; padding: 8px 4px; min-height: 36px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+.platform { margin: 2px 0 4px; }
+.platform svg { display: block; width: 100%; height: auto; }
+.ends { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); margin-top: -2px; }
+.ends span:last-child { text-align: right; }
+
+.dirs { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.dir {
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 10px 12px 8px;
+}
+.dir-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.dir-text { min-width: 0; }
+.dir-from { font-size: 15px; }
+.dir-from b { font-weight: 700; }
+.dir-to { font-size: 13.5px; color: var(--muted); margin-top: 1px; }
+.dir-lines { display: inline-flex; flex-wrap: wrap; gap: 3px; vertical-align: 1px; margin-left: 4px; }
+.dir-lines .badge { min-width: 22px; height: 18px; font-size: 11.5px; border-radius: 5px; padding: 0 4px; }
+.answer { flex: none; text-align: right; line-height: 1.05; }
+.answer .verb { display: block; font-size: 12.5px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.answer .ans {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.train { display: block; width: 100%; height: auto; margin-top: 6px; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 14px; color: var(--muted); }
+.meta-row a { color: var(--ink-2); text-underline-offset: 3px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 13px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.warn { color: var(--ink-2); background: var(--accent-soft); border-radius: 10px; padding: 8px 10px; font-size: 14px; margin-top: 10px; }
+.empty { background: var(--surface); border: 1px dashed var(--line-2); border-radius: var(--radius); padding: 18px; color: var(--muted); }
+.more-btn {
+  width: 100%;
+  min-height: 48px;
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+/* ---------- how it works + footer */
+.how { margin-top: 26px; display: grid; gap: 10px; }
+.how h2 { font-family: var(--font-display); font-size: 19px; margin: 0; letter-spacing: -0.01em; }
+.how p { margin: 0; color: var(--ink-2); font-size: 15px; max-width: 38em; }
+footer { color: var(--muted); font-size: 13px; padding-block: 18px 34px; border-top: 1px solid var(--line); margin-top: 22px; }
+footer p { margin: 0 0 6px; max-width: 40em; }
+.loading { color: var(--muted); font-size: 14px; }
+
+@media (min-width: 700px) {
+  .masthead { padding-block: 34px 8px; }
+  .dest h2 { font-size: 30px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card { animation: rise .3s ease; }
+  @keyframes rise { from { transform: translateY(8px); } to { transform: none; } }
+  .xchip, .chip, .opt { transition: background-color .12s ease, border-color .12s ease; }
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="brand">
+      <svg viewBox="0 0 46 20" aria-hidden="true">
+        <rect x="1" y="3" width="13" height="13" rx="3" fill="var(--train)"/>
+        <rect x="16" y="3" width="13" height="13" rx="3" fill="var(--train)"/>
+        <path d="M31 3h8.5c3 0 5.5 3 5.5 6.5S42.5 16 39.5 16H31z" fill="var(--accent)"/>
+        <rect x="3" y="6" width="9" height="4" rx="1" fill="var(--train-win)"/>
+        <rect x="18" y="6" width="9" height="4" rx="1" fill="var(--train-win)"/>
+        <rect x="33" y="6" width="7" height="4" rx="1" fill="var(--accent-ink)" opacity=".35"/>
+        <rect x="0" y="18" width="46" height="2" rx="1" fill="var(--edge)"/>
+      </svg>
+      <h1>Fram eller bak?</h1>
+    </div>
+    <p class="tagline">Sök vart du ska. Du får veta var du ska sitta på tåget för att kliva av närmast rätt uppgång.</p>
+  </header>
+</div>
+
+<div class="searchbar">
+  <div class="wrap">
+    <form id="searchForm" role="search" autocomplete="off">
+      <label class="sr-only" for="q">Vart ska du?</label>
+      <div class="field">
+        <svg class="glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+        <input id="q" type="search" name="q" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Vart ska du? T.ex. Södersjukhuset" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+        <button type="button" id="clearBtn" class="clear" aria-label="Rensa sökningen" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <ul id="suggest" class="suggest" role="listbox" aria-label="Sökförslag" hidden></ul>
+    </form>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="chips" class="chips"></div>
+  <main id="result" aria-live="polite"></main>
+
+  <section class="how" aria-labelledby="howTitle">
+    <h2 id="howTitle">Så funkar det</h2>
+    <p>Varje station har uppgångar i olika ändar av perrongen. Välj ett mål, så räknar vi ut vilken uppgång som ligger närmast och var den finns i förhållande till tågets färdriktning. Sitter du längst fram eller bak kliver du av precis vid trappan.</p>
+    <p>Kortare tåg stannar ofta mitt på perrongen. Rådet gäller ändå: gå till samma ände av tåget.</p>
+  </section>
+
+  <footer>
+    <p>Stationslägen och uppgångar kommer från OpenStreetMap och är kontrollerade mot bland annat Wikipedia. Ombyggnader och stängda uppgångar kan göra att något inte stämmer – kolla skyltarna på plats.</p>
+    <p>Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL eller Region Stockholm.</p>
+  </footer>
+</div>
+
+<noscript><div class="wrap"><p class="empty">Sidan behöver JavaScript för att söka.</p></div></noscript>
+
+<script id="stations-data" type="application/json">/*__STATIONS__*/</script>
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("stations-data").textContent);
+  var STATIONS = DATA.stations;
+  var EXAMPLE = DATA.example || null;
+  var PLACES_URL = DATA.placesUrl || "places.json";
+
+  var SYS = {
+    metro:   { name: "Tunnelbana",   letter: "T", color: "var(--ink-2)" },
+    pendel:  { name: "Pendeltåg",    letter: "J", color: "var(--pendel)" },
+    roslag:  { name: "Roslagsbanan", letter: "L", color: "var(--roslag)" },
+    saltsjo: { name: "Saltsjöbanan", letter: "S", color: "var(--saltsjo)" },
+    tvar:    { name: "Tvärbanan",    letter: "L", color: "var(--tvar)" },
+    lidingo: { name: "Lidingöbanan", letter: "L", color: "var(--lidingo)" },
+    nockeby: { name: "Nockebybanan", letter: "L", color: "var(--nockeby)" }
+  };
+  var LINE_COLOR = { "10": "var(--blue)", "11": "var(--blue)", "13": "var(--red)", "14": "var(--red)", "17": "var(--green)", "18": "var(--green)", "19": "var(--green)",
+    "40": "var(--pendel)", "41": "var(--pendel)", "42": "var(--pendel)", "42X": "var(--pendel)", "43": "var(--pendel)", "43X": "var(--pendel)", "44": "var(--pendel)", "48": "var(--pendel)",
+    "27": "var(--roslag)", "28": "var(--roslag)", "29": "var(--roslag)", "25": "var(--saltsjo)", "26": "var(--saltsjo)",
+    "30": "var(--tvar)", "31": "var(--tvar)", "21": "var(--lidingo)", "12": "var(--nockeby)" };
+  var LINE_NAME = { "10": "Blå linjen", "11": "Blå linjen", "13": "Röda linjen", "14": "Röda linjen", "17": "Gröna linjen", "18": "Gröna linjen", "19": "Gröna linjen" };
+
+  function stationColor(st) {
+    if (st.s !== "metro") return SYS[st.s].color;
+    var l = st.lines;
+    var cols = {};
+    l.forEach(function (x) { cols[LINE_COLOR[x]] = 1; });
+    var k = Object.keys(cols);
+    return k.length === 1 ? k[0] : "var(--ink-2)";
+  }
+
+  // ------------------------------------------------------------ utils
+  var $ = function (s, el) { return (el || document).querySelector(s); };
+  function fold(s) {
+    return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+  function hav(a, b, c, d) {
+    var R = 6371000, r = Math.PI / 180;
+    var x = Math.pow(Math.sin((c - a) * r / 2), 2) + Math.cos(a * r) * Math.cos(c * r) * Math.pow(Math.sin((d - b) * r / 2), 2);
+    return 2 * R * Math.asin(Math.sqrt(x));
+  }
+  function fmtDist(m) {
+    if (m < 1000) return (m < 100 ? Math.max(10, Math.round(m / 10) * 10) : Math.round(m / 10) * 10) + " m";
+    return (m / 1000).toFixed(1).replace(".", ",") + " km";
+  }
+  // straight-line metres -> estimated walking metres / minutes (streets are rarely straight)
+  var DETOUR = 1.25;
+  function walkM(m) { return m * DETOUR; }
+  function walkMin(m) { return Math.max(1, Math.round(walkM(m) / 80)); }
+  function slug(s) { return fold(s).replace(/ /g, "-"); }
+  function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  function badge(line) {
+    return '<span class="badge" style="background:' + (LINE_COLOR[line] || "var(--ink-2)") + '">' + esc(line) + "</span>";
+  }
+  function letter(i) { return String.fromCharCode(65 + i); }
+
+  // ------------------------------------------------------------ answers
+  function answerFor(trel) {
+    if (trel >= 0.55) return { text: "längst fram", key: "f2" };
+    if (trel >= 0.2) return { text: "en bit fram", key: "f1" };
+    if (trel > -0.2) return { text: "i mitten", key: "m" };
+    if (trel > -0.55) return { text: "en bit bak", key: "b1" };
+    return { text: "längst bak", key: "b2" };
+  }
+  var X0 = 22, X1 = 298;
+  function xOf(t) { t = Math.max(-1, Math.min(1, t)); return X0 + (t + 1) / 2 * (X1 - X0); }
+
+  function platformSVG(g, sel, onlySel) {
+    var h = 58;
+    var s = '<svg viewBox="0 0 320 ' + h + '" aria-hidden="true" focusable="false">';
+    s += '<rect x="' + (X0 - 6) + '" y="34" width="' + (X1 - X0 + 12) + '" height="12" rx="3" fill="var(--platform)"/>';
+    s += '<line x1="' + (X0 - 6) + '" y1="47.5" x2="' + (X1 + 6) + '" y2="47.5" stroke="var(--edge)" stroke-width="3" stroke-dasharray="7 5"/>';
+    // order exits by position so letters read left to right
+    g.ex.forEach(function (e, i) {
+      if (onlySel && i !== sel) return;
+      var x = xOf(e.t);
+      var on = i === sel;
+      s += '<line x1="' + x + '" y1="24" x2="' + x + '" y2="34" stroke="' + (on ? "var(--ink)" : "var(--line-2)") + '" stroke-width="2"/>';
+      s += '<rect x="' + (x - 11) + '" y="3" width="22" height="22" rx="6" fill="' + (on ? "var(--accent)" : "var(--surface)") + '" stroke="' + (on ? "var(--accent)" : "var(--line-2)") + '" stroke-width="1.5"/>';
+      s += '<text x="' + x + '" y="19" text-anchor="middle" font-family="Familjen Grotesk, Arial, sans-serif" font-weight="700" font-size="14" fill="' + (on ? "var(--accent-ink)" : "var(--ink)") + '">' + (onlySel ? "↑" : letter(i)) + "</text>";
+    });
+    s += "</svg>";
+    return s;
+  }
+
+  function trainSVG(dir, t) {
+    // train drawn on the same axis as the platform; dir=+1 means it travels to the right
+    var n = 6, gap = 3, w = (X1 - X0 - gap * (n - 1)) / n;
+    var x = xOf(t);
+    var hi = Math.min(n - 1, Math.max(0, Math.floor((x - X0) / (w + gap))));
+    var s = '<svg class="train" viewBox="0 0 320 34" aria-hidden="true" focusable="false">';
+    for (var i = 0; i < n; i++) {
+      var cx = X0 + i * (w + gap);
+      var front = (dir > 0 && i === n - 1) || (dir < 0 && i === 0);
+      var on = i === hi;
+      var fill = on ? "var(--accent)" : "var(--train)";
+      if (front) {
+        // rounded nose on the travel side
+        var r = 9;
+        if (dir > 0) {
+          s += '<path d="M' + (cx + 3) + ' 9H' + (cx + w - r) + 'Q' + (cx + w + 2) + ' 9 ' + (cx + w + 2) + ' ' + (9 + r) + 'V' + 26 + 'H' + (cx + 3) + 'Q' + cx + ' 26 ' + cx + ' 23V12Q' + cx + ' 9 ' + (cx + 3) + ' 9Z" fill="' + fill + '"/>';
+        } else {
+          s += '<path d="M' + (cx + w - 3) + ' 9H' + (cx + r) + 'Q' + (cx - 2) + ' 9 ' + (cx - 2) + ' ' + (9 + r) + 'V26H' + (cx + w - 3) + 'Q' + (cx + w) + ' 26 ' + (cx + w) + ' 23V12Q' + (cx + w) + ' 9 ' + (cx + w - 3) + ' 9Z" fill="' + fill + '"/>';
+        }
+      } else {
+        s += '<rect x="' + cx + '" y="9" width="' + w + '" height="17" rx="3" fill="' + fill + '"/>';
+      }
+      // windows
+      var wx0 = cx + 5, wx1 = cx + w - 5;
+      if (front && dir > 0) wx1 -= 8;
+      if (front && dir < 0) wx0 += 8;
+      s += '<rect x="' + wx0 + '" y="12.5" width="' + Math.max(4, wx1 - wx0) + '" height="5" rx="1.5" fill="' + (on ? "var(--accent-ink)" : "var(--train-win)") + '" opacity="' + (on ? ".28" : "1") + '"/>';
+    }
+    // direction chevron beyond the nose
+    if (dir > 0) s += '<path d="M' + (X1 + 8) + ' 12l6 5.5-6 5.5" fill="none" stroke="var(--muted)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    else s += '<path d="M' + (X0 - 8) + ' 12l-6 5.5 6 5.5" fill="none" stroke="var(--muted)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    // exit marker above the highlighted car
+    var mx = X0 + hi * (w + gap) + w / 2;
+    s += '<path d="M' + (mx - 5) + ' 6l5-5 5 5" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
+    s += "</svg>";
+    return s;
+  }
+
+  // ------------------------------------------------------------ geometry helpers on stations
+  // islands without rail: walking has to go via a bridge, not straight across the water
+  var ISLANDS = [
+    { test: function (la, lo) { return la > 59.315 && la < 59.3318 && lo > 18.088 && lo < 18.15; },
+      bridges: [[59.3319, 18.0928], [59.3307, 18.1275]],
+      tip: "Djurgården nås lättast med spårvagn 7, buss 67 eller färjan från Slussen." },
+    { test: function (la, lo) { return la > 59.3205 && la < 59.3287 && lo > 18.0775 && lo < 18.0935; },
+      bridges: [[59.3278, 18.0797]], tip: "" }
+  ];
+  function islandOf(lat, lon) {
+    for (var i = 0; i < ISLANDS.length; i++) if (ISLANDS[i].test(lat, lon)) return ISLANDS[i];
+    return null;
+  }
+  function walkDist(lat, lon, p, isl) {
+    if (!isl || isl.test(p[0], p[1])) return hav(lat, lon, p[0], p[1]);
+    var best = Infinity;
+    isl.bridges.forEach(function (b) { best = Math.min(best, hav(lat, lon, b[0], b[1]) + hav(b[0], b[1], p[0], p[1])); });
+    return best;
+  }
+  function exitDist(e, lat, lon) {
+    var isl = islandOf(lat, lon);
+    var best = Infinity;
+    for (var i = 0; i < e.p.length; i++) {
+      var d = walkDist(lat, lon, e.p[i], isl);
+      if (d < best) best = d;
+    }
+    return best;
+  }
+  function stationDistance(st, lat, lon) {
+    var best = { d: walkDist(lat, lon, st.ll, islandOf(lat, lon)) + 60, gi: -1, ei: -1 };
+    st.g.forEach(function (g, gi) {
+      g.ex.forEach(function (e, ei) {
+        var d = exitDist(e, lat, lon);
+        if (d < best.d) best = { d: d, gi: gi, ei: ei };
+      });
+    });
+    return best;
+  }
+  function nearbyStations(lat, lon) {
+    var all = [];
+    STATIONS.forEach(function (st) {
+      if (Math.abs(st.ll[0] - lat) > 0.04 || Math.abs(st.ll[1] - lon) > 0.08) return;
+      var b = stationDistance(st, lat, lon);
+      all.push({ st: st, d: b.d });
+    });
+    all.sort(function (a, b) { return a.d - b.d; });
+    var pick = [], seen = {};
+    // closest few, then the closest of any other system still within walking distance
+    all.forEach(function (r) {
+      if (pick.length < 3 && r.d <= 1300) { pick.push(r); seen[r.st.s] = 1; }
+    });
+    all.forEach(function (r) {
+      if (pick.length < 5 && !seen[r.st.s] && r.d <= 1100 && pick.indexOf(r) < 0) { pick.push(r); seen[r.st.s] = 1; }
+    });
+    if (!pick.length && all.length) pick.push(all[0]);
+    return { pick: pick, nearest: all[0] };
+  }
+
+  // ------------------------------------------------------------ rendering
+  var result = $("#result");
+  var selState = {}; // "stationId:gi" -> selected exit index
+  var openState = {}; // "stationId:gi" -> exit list expanded
+  function rerenderGroup(grp) {
+    var card = grp.closest(".card");
+    var st = STATIONS_BY_ID[card.getAttribute("data-st")];
+    var dest = current && current.type === "place" ? current.place : null;
+    var tmp = document.createElement("div");
+    tmp.innerHTML = groupHTML(st, +grp.getAttribute("data-key").split(":").pop(), dest);
+    var fresh = tmp.firstChild;
+    grp.replaceWith(fresh);
+    revealSelected(fresh);
+    return fresh;
+  }
+
+  function dirRow(g, d, sel) {
+    var reach = !d.x || d.x.indexOf(sel) >= 0;
+    var via = "";
+    if (!reach && d.x && d.x.length) {
+      // this direction's platform has its own exit: use the one closest to the chosen exit
+      var alt = d.x[0];
+      d.x.forEach(function (i) { if (Math.abs(g.ex[i].t - g.ex[sel].t) < Math.abs(g.ex[alt].t - g.ex[sel].t)) alt = i; });
+      via = '<div class="dir-to">Gå ut via uppgång ' + letter(alt) + " · " + esc(g.ex[alt].n) + "</div>";
+      sel = alt; reach = true;
+    }
+    var e = g.ex[sel];
+    var trel = e.t * d.dir;
+    var a = answerFor(trel);
+    var lines = d.l.map(badge).join("");
+    var to = d.to.join(" · ");
+    var html = '<li class="dir"><div class="dir-top"><div class="dir-text">' +
+      '<div class="dir-from">Från <b>' + esc(d.from) + '</b><span class="dir-lines">' + lines + "</span></div>" +
+      '<div class="dir-to">mot ' + esc(to) + "</div>" + via + "</div>";
+    if (reach) {
+      html += '<div class="answer"><span class="verb">Sitt</span><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
+    } else {
+      html += '<div class="answer"><span class="verb">Uppgång ' + letter(sel) + '</span><span class="ans" style="font-size:16px">nås inte härifrån</span></div></div>';
+    }
+    return html + "</li>";
+  }
+
+  function groupHTML(st, gi, dest) {
+    var g = st.g[gi];
+    var key = st.id + ":" + gi;
+    var dists = dest ? g.ex.map(function (e) { return exitDist(e, dest.lat, dest.lon); }) : null;
+    if (selState[key] == null) {
+      if (dists) {
+        var bi = 0;
+        dists.forEach(function (d, i) { if (d < dists[bi]) bi = i; });
+        selState[key] = bi;
+      } else selState[key] = 0;
+    }
+    var sel = selState[key];
+    var html = '<div class="group" data-key="' + esc(key) + '">';
+    if (st.g.length > 1) {
+      var lname = LINE_NAME[g.lines[0]];
+      html += '<div class="group-title">' + g.lines.map(badge).join("") + (lname && st.s === "metro" ? " " + (g.lines.every(function (l) { return LINE_NAME[l] === lname; }) ? lname : "Perrong " + (gi + 1)) : "") + "</div>";
+    }
+    var collapsed = dists && g.ex.length > 1 && !openState[key];
+    if (collapsed) {
+      html += '<div class="bestexit"><span class="pill">Uppgång: <b>' + esc(g.ex[sel].n) + '</b></span> <span class="pill">' +
+        fmtDist(walkM(dists[sel])) + ' till målet</span> <button type="button" class="linkbtn more-exits">Annan uppgång</button></div>';
+    } else if (g.ex.length > 1) {
+      html += '<div class="exitpick" role="radiogroup" aria-label="Välj uppgång">';
+      g.ex.forEach(function (e, i) {
+        var sub = dists ? fmtDist(walkM(dists[i])) + " till målet" : (e.h === 1 ? "Hiss" : "");
+        html += '<button type="button" class="xchip" role="radio" aria-checked="' + (i === sel) + '" data-i="' + i + '">' +
+          '<span class="letter">' + letter(i) + '</span><span><span class="xname">' + esc(e.n) + "</span>" +
+          (sub ? '<span class="xdist">' + esc(sub) + "</span>" : "") + "</span></button>";
+      });
+      html += "</div>";
+    } else if (g.ex.length === 1) {
+      html += '<div class="group-title" style="margin-bottom:4px"><span class="pill">Uppgång: <b>' + esc(g.ex[0].n) + "</b></span>" +
+        (dists ? ' <span class="pill">' + fmtDist(walkM(dists[0])) + " till målet</span>" : "") + "</div>";
+    }
+    html += '<div class="platform">' + platformSVG(g, sel, collapsed) +
+      '<div class="ends"><span>' + (g.L ? "← " + esc(g.L) : "Ändstation") + "</span><span>" + (g.R ? esc(g.R) + " →" : "Ändstation") + "</span></div></div>";
+    html += '<ul class="dirs">' + g.d.map(function (d) { return dirRow(g, d, sel); }).join("") + "</ul>";
+    var e = g.ex[sel];
+    var meta = [];
+    if (e.h === 1) meta.push('<span class="pill">Hiss</span>');
+    if (e.o) meta.push("<span>" + esc(e.o) + "</span>");
+    var p = e.p[0];
+    meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">Visa uppgång ' + letter(sel) + " på kartan</a>");
+    html += '<div class="meta-row">' + meta.join("") + "</div>";
+    if (st.c === "low") html += '<p class="warn">Osäkert underlag för den här stationen. Titta efter skyltarna på perrongen.</p>';
+    else if (st.c === "auto") html += '<p class="warn">Uträknat från kartdata och ännu inte kontrollerat mot andra källor.</p>';
+    return html + "</div>";
+  }
+
+  function cardHTML(st, dest, dist) {
+    var head = '<div class="card-head"><span class="mode" style="background:' + stationColor(st) + '">' + SYS[st.s].letter + "</span>" +
+      '<div class="card-title"><h3>' + esc(st.n) + '</h3><div class="card-meta">' + SYS[st.s].name + " " + st.lines.map(badge).join("") + "</div></div>";
+    if (dist != null) head += '<div class="walk"><strong>' + fmtDist(walkM(dist)) + "</strong><span>ca " + walkMin(dist) + " min gång</span></div>";
+    head += "</div>";
+    var body = st.g.map(function (g, gi) { return groupHTML(st, gi, dest); }).join("");
+    return '<section class="card" data-st="' + esc(st.id) + '">' + head + body + "</section>";
+  }
+
+  var current = null; // {type:'place'|'station', ...}
+  function render() {
+    if (!current) return;
+    var html = "";
+    if (current.type === "station") {
+      var st = current.st;
+      html += '<div class="dest"><div class="kicker">Station</div><h2>' + esc(st.n) + '</h2><div class="dest-sub">Välj uppgång för att se var du ska sitta.</div></div>';
+      html += '<div class="cards">' + cardHTML(st, null, null) + "</div>";
+    } else {
+      var pl = current.place;
+      if (current.example) html += '<div class="example-note">Exempel – sök på ditt eget mål ovan</div>';
+      html += '<div class="dest"><div class="kicker">' + esc(pl.cat || "Plats") + "</div><h2>" + esc(pl.name) + "</h2>" + (pl.sub ? '<div class="dest-sub">' + esc(pl.sub) + "</div>" : "") + "</div>";
+      var near = nearbyStations(pl.lat, pl.lon);
+      if (!near.pick.length) {
+        html += '<p class="empty">Hittade ingen station i närheten.</p>';
+      } else {
+        var far = near.pick[0].d > 1300;
+        var isl = islandOf(pl.lat, pl.lon);
+        if (far) html += '<p class="warn">Det är en bit att gå från närmaste station (ca ' + fmtDist(walkM(near.pick[0].d)) + ")." + (isl && isl.tip ? " " + isl.tip : "") + "</p>";
+        html += '<div class="cards">' + near.pick.map(function (r) { return cardHTML(r.st, pl, r.d); }).join("") + "</div>";
+      }
+    }
+    result.innerHTML = html;
+    revealSelected(result);
+  }
+  function revealSelected(root) {
+    Array.prototype.forEach.call(root.querySelectorAll(".exitpick"), function (row) {
+      var on = row.querySelector('.xchip[aria-checked="true"]');
+      if (!on) return;
+      var left = on.offsetLeft - row.offsetLeft - 16;
+      if (left + on.offsetWidth > row.clientWidth || left < 0) row.scrollLeft = Math.max(0, left - (row.clientWidth - on.offsetWidth) / 2);
+    });
+  }
+
+  result.addEventListener("click", function (ev) {
+    var more = ev.target.closest(".more-exits");
+    if (more) {
+      var g0 = more.closest(".group");
+      openState[g0.getAttribute("data-key")] = true;
+      rerenderGroup(g0);
+      var first = result.querySelector('.group[data-key="' + g0.getAttribute("data-key") + '"] .xchip[aria-checked="true"]');
+      if (first) first.focus({ preventScroll: true });
+      return;
+    }
+    var b = ev.target.closest(".xchip");
+    if (!b) return;
+    var grp = b.closest(".group");
+    selState[grp.getAttribute("data-key")] = +b.getAttribute("data-i");
+    var card = b.closest(".card");
+    var st = STATIONS_BY_ID[card.getAttribute("data-st")];
+    var dest = current && current.type === "place" ? current.place : null;
+    var gi = +grp.getAttribute("data-key").split(":").pop();
+    var tmp = document.createElement("div");
+    tmp.innerHTML = groupHTML(st, gi, dest);
+    var fresh = tmp.firstChild;
+    var oldRow = grp.querySelector(".exitpick"), keep = oldRow ? oldRow.scrollLeft : 0;
+    grp.replaceWith(fresh);
+    var newRow = fresh.querySelector(".exitpick");
+    if (newRow) newRow.scrollLeft = keep;
+    var nb = fresh.querySelector('.xchip[data-i="' + b.getAttribute("data-i") + '"]');
+    if (nb) nb.focus({ preventScroll: true });
+  });
+
+  var STATIONS_BY_ID = {};
+  STATIONS.forEach(function (st) { STATIONS_BY_ID[st.id] = st; });
+
+  // ------------------------------------------------------------ search index
+  var IDX = [];
+  function toks(s) { return fold(s).split(" ").filter(Boolean); }
+  STATIONS.forEach(function (st) {
+    var extra = (st.al || []).join(" ");
+    IDX.push({ k: "st", name: st.n, sub: SYS[st.s].name + " · " + st.lines.join(" "), f: fold(st.n), af: (st.al || []).map(fold), nt: toks(st.n + " " + extra), xt: toks(SYS[st.s].name + " station"), w: st.s === "metro" || st.s === "pendel" ? 118 : 108, st: st });
+  });
+  var PL = null, ADDR = null, ADDR_KEYS = null, placesState = "idle";
+  function loadPlaces() {
+    if (placesState !== "idle") return;
+    placesState = "loading";
+    fetch(PLACES_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+      PL = d;
+      var cats = d.cats, areas = d.areas;
+      var L0 = d.lat0, O0 = d.lon0;
+      d.p.forEach(function (p) {
+        var area = p[4] >= 0 ? areas[p[4]] : "";
+        var sub = cats[p[1]] + (p[5] ? " · " + p[5] : "") + (area ? " · nära " + area : "");
+        IDX.push({ k: "p", name: p[0], cat: cats[p[1]], sub: sub, f: fold(p[0]), af: p[6] ? p[6].split(";").map(fold) : null, nt: toks(p[0] + " " + (p[6] || "")), xt: toks(cats[p[1]] + " " + area + " " + (p[5] || "")), w: p[7], lat: L0 + p[2] / 1e5, lon: O0 + p[3] / 1e5, addr: p[5] });
+      });
+      d.s.forEach(function (s) {
+        var area = s[1] >= 0 ? areas[s[1]] : "";
+        IDX.push({ k: "s", name: s[0], cat: "Gata", sub: "Gata · nära " + area, f: fold(s[0]), nt: toks(s[0]), xt: toks(area), w: 44, lat: L0 + s[2] / 1e5, lon: O0 + s[3] / 1e5 });
+      });
+      ADDR = d.a; ADDR_KEYS = Object.keys(d.a).map(function (k) { var parts = k.split("|"); return { k: k, street: parts[0], city: parts[1], f: fold(parts[0]), ct: toks(parts[1] || "") }; });
+      placesState = "ready";
+      if (qEl.value.trim() && document.activeElement === qEl) update();
+      routeFromHash(true);
+    }).catch(function () { placesState = "failed"; if (qEl.value.trim() && document.activeElement === qEl) update(); });
+  }
+
+  function decodeAddr(key) {
+    var s = ADDR[key], out = [], la = 0, lo = 0;
+    s.split(";").forEach(function (part, i) {
+      var a = part.split(",");
+      if (i === 0) { la = +a[1]; lo = +a[2]; } else { la += +a[1]; lo += +a[2]; }
+      out.push({ n: a[0], lat: PL.lat0 + la / 1e5, lon: PL.lon0 + lo / 1e5 });
+    });
+    return out;
+  }
+
+  function matchTokens(qt, e) {
+    var inName = 0;
+    for (var i = 0; i < qt.length; i++) {
+      var t = qt[i], hit = false;
+      for (var j = 0; j < e.nt.length; j++) if (e.nt[j].indexOf(t) === 0) { hit = true; inName++; break; }
+      if (!hit) for (var k = 0; k < e.xt.length; k++) if (e.xt[k].indexOf(t) === 0) { hit = true; break; }
+      if (!hit) return -1;
+    }
+    return inName;
+  }
+
+  function nearestArea(lat, lon) {
+    var best = null, bd = Infinity;
+    STATIONS.forEach(function (st) {
+      var d = hav(lat, lon, st.ll[0], st.ll[1]) - (st.s === "metro" || st.s === "pendel" ? 60 : 0);
+      if (d < bd) { bd = d; best = st.n; }
+    });
+    return best;
+  }
+
+  function search(q) {
+    var fq = fold(q);
+    if (!fq) return [];
+    var qt = fq.split(" ");
+    var res = [];
+    // addresses: "gatan 12"
+    var numIdx = -1;
+    qt.forEach(function (t, i) { if (/^\d+[a-z]?$/.test(t) && i > 0) numIdx = i; });
+    if (numIdx > 0 && ADDR_KEYS) {
+      var num = qt[numIdx].toUpperCase();
+      var st = qt.slice(0, numIdx), rest = qt.slice(numIdx + 1);
+      var stf = st.join(" ");
+      ADDR_KEYS.forEach(function (a) {
+        if (a.f.indexOf(stf) !== 0) return;
+        if (rest.length && !rest.every(function (t) { return a.ct.some(function (c) { return c.indexOf(t) === 0; }); })) return;
+        var list = decodeAddr(a.k);
+        var hit = null;
+        for (var i = 0; i < list.length; i++) if (list[i].n === num) { hit = list[i]; break; }
+        if (!hit) for (var j = 0; j < list.length; j++) if (parseInt(list[j].n, 10) === parseInt(num, 10)) { hit = list[j]; break; }
+        if (!hit) return;
+        var area = nearestArea(hit.lat, hit.lon);
+        res.push({ e: { k: "a", name: a.street + " " + hit.n, cat: "Adress", sub: "Adress" + (a.city ? " · " + a.city : "") + " · nära " + area, lat: hit.lat, lon: hit.lon }, s: 200 - (a.f === stf ? 0 : 10) });
+      });
+    }
+    for (var i = 0; i < IDX.length; i++) {
+      var e = IDX[i];
+      var m = matchTokens(qt, e);
+      if (m < 0) continue;
+      var s = e.w;
+      if (e.f === fq) s += 120;
+      else if (e.f.indexOf(fq) === 0) s += 70;
+      else if (e.af && e.af.some(function (a) { return a === fq; })) s += 105;
+      else if (e.af && e.af.some(function (a) { return a.indexOf(fq) === 0; })) s += 60;
+      else if (m === qt.length) s += 30;
+      s += m * 6;
+      s -= Math.min(30, e.f.length * 0.2);
+      res.push({ e: e, s: s });
+    }
+    res.sort(function (a, b) { return b.s - a.s; });
+    var out = [], seen = {};
+    for (var r = 0; r < res.length && out.length < 8; r++) {
+      var x = res[r].e;
+      var key = x.k === "st" ? "st" + x.st.id : fold(x.name) + "|" + (x.cat || "") + "|" + (x.lat ? Math.round(x.lat * 200) + "," + Math.round(x.lon * 100) : "");
+      if (seen[key]) continue;
+      seen[key] = 1;
+      out.push(x);
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------ search UI
+  var qEl = $("#q"), sugEl = $("#suggest"), clearBtn = $("#clearBtn"), chipsEl = $("#chips");
+  var opts = [], active = -1;
+
+  var ICON = {
+    p: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+    s: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3 5 21M16 3l3 18M12 4v3M12 11v3M12 18v2"/></svg>',
+    a: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-5h4v5"/></svg>'
+  };
+  function hl(name, q) {
+    var fq = fold(q).split(" ")[0];
+    if (!fq) return esc(name);
+    var f = fold(name);
+    var idx = f.indexOf(fq);
+    if (idx < 0 || f.length !== name.length) return esc(name);
+    return esc(name.slice(0, idx)) + "<mark>" + esc(name.slice(idx, idx + fq.length)) + "</mark>" + esc(name.slice(idx + fq.length));
+  }
+  function optHTML(e, i, q) {
+    var icon = e.k === "st" ? '<span class="mode" style="background:' + stationColor(e.st) + '">' + SYS[e.st.s].letter + "</span>" : '<span class="ico">' + (ICON[e.k] || ICON.p) + "</span>";
+    return '<li class="opt" role="option" id="opt-' + i + '" aria-selected="' + (i === active) + '" data-i="' + i + '">' + icon +
+      '<span class="opt-main"><span class="opt-name">' + hl(e.name, q) + '</span><span class="opt-sub">' + esc(e.sub) + "</span></span></li>";
+  }
+  function showSug(show) {
+    sugEl.hidden = !show;
+    qEl.setAttribute("aria-expanded", show ? "true" : "false");
+    if (show) fitSuggest();
+  }
+  // keep the suggestion list above the on-screen keyboard
+  function fitSuggest() {
+    var vv = window.visualViewport;
+    var h = vv ? vv.height : window.innerHeight;
+    var top = sugEl.getBoundingClientRect().top;
+    var avail = Math.max(180, Math.min(520, h - top - 12));
+    document.documentElement.style.setProperty("--sug-max", avail + "px");
+  }
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { if (!sugEl.hidden) fitSuggest(); });
+  function update() {
+    var q = qEl.value;
+    clearBtn.hidden = !q;
+    if (!q.trim()) { opts = []; showSug(false); renderChips(); return; }
+    loadPlaces();
+    opts = search(q);
+    active = opts.length ? 0 : -1;
+    var html = opts.map(function (e, i) { return optHTML(e, i, q); }).join("");
+    if (!opts.length) {
+      html = '<li class="opt-empty">' + (placesState === "loading" ? "Laddar platser…" : "Hittade inget. Prova ett stationsnamn, en gata eller ett ställe.") + "</li>";
+    } else if (placesState === "loading") {
+      html += '<li class="opt-empty loading">Laddar fler platser…</li>';
+    }
+    sugEl.innerHTML = html;
+    qEl.setAttribute("aria-activedescendant", active >= 0 ? "opt-" + active : "");
+    showSug(true);
+  }
+  function setActive(i) {
+    if (!opts.length) return;
+    active = (i + opts.length) % opts.length;
+    Array.prototype.forEach.call(sugEl.querySelectorAll(".opt"), function (li, j) { li.setAttribute("aria-selected", j === active ? "true" : "false"); });
+    qEl.setAttribute("aria-activedescendant", "opt-" + active);
+    var li = sugEl.querySelector("#opt-" + active);
+    if (li) li.scrollIntoView({ block: "nearest" });
+  }
+
+  function choose(e, opts2) {
+    opts2 = opts2 || {};
+    selState = {}; openState = {};
+    if (e.k === "st") {
+      current = { type: "station", st: e.st };
+      setHash("s-" + e.st.id);
+    } else {
+      var sub = e.sub ? e.sub.replace(/ · nära .*$/, "") : "";
+      if (e.cat && sub.indexOf(e.cat) === 0) sub = sub.slice(e.cat.length).replace(/^ · /, "");
+      current = { type: "place", place: { name: e.name, sub: sub, cat: e.cat, lat: e.lat, lon: e.lon } };
+      var area = e.sub && / · nära (.*)$/.exec(e.sub);
+      setHash("q-" + slug(e.name + (e.k !== "a" && area ? " " + area[1] : "")));
+    }
+    if (!opts2.keepInput) qEl.value = e.name;
+    clearBtn.hidden = !qEl.value;
+    showSug(false);
+    if (!opts2.silent) {
+      qEl.blur();
+      pushRecent(e);
+    }
+    render();
+    renderChips();
+    if (!opts2.silent) {
+      var top = result.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top: Math.max(0, top), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+  }
+
+  var routedHash = null;
+  function setHash(h) {
+    routedHash = h;
+    try { history.replaceState(null, "", "#" + h); } catch (e) { /* ignore */ }
+  }
+
+  qEl.addEventListener("input", update);
+  qEl.addEventListener("focus", function () { loadPlaces(); if (qEl.value.trim()) update(); });
+  qEl.addEventListener("keydown", function (ev) {
+    if (ev.key === "ArrowDown") { ev.preventDefault(); setActive(active + 1); }
+    else if (ev.key === "ArrowUp") { ev.preventDefault(); setActive(active - 1); }
+    else if (ev.key === "Enter") { ev.preventDefault(); if (opts[active]) choose(opts[active]); }
+    else if (ev.key === "Escape") { showSug(false); }
+  });
+  $("#searchForm").addEventListener("submit", function (ev) { ev.preventDefault(); if (opts[active]) choose(opts[active]); });
+  sugEl.addEventListener("mousedown", function (ev) { ev.preventDefault(); });
+  sugEl.addEventListener("click", function (ev) {
+    var li = ev.target.closest(".opt");
+    if (li) choose(opts[+li.getAttribute("data-i")]);
+  });
+  clearBtn.addEventListener("click", function () { qEl.value = ""; update(); qEl.focus(); });
+  document.addEventListener("click", function (ev) { if (!ev.target.closest("#searchForm")) showSug(false); });
+
+  // ------------------------------------------------------------ chips: recent + examples
+  var EXAMPLES = ["Södersjukhuset", "Globen", "Lidl Solna centrum", "Karolinska sjukhuset", "Mall of Scandinavia", "Stockholms universitet", "Odenplan"];
+  function pushRecent(e) {
+    var r = store("feb.recent") || [];
+    var item = e.k === "st" ? { k: "st", id: e.st.id, name: e.st.n } : { k: e.k, name: e.name, sub: e.sub, cat: e.cat, lat: e.lat, lon: e.lon };
+    r = r.filter(function (x) { return x.name !== item.name; });
+    r.unshift(item);
+    store("feb.recent", r.slice(0, 6));
+  }
+  function renderChips() {
+    var r = store("feb.recent") || [];
+    var html = "";
+    if (r.length) {
+      html += '<div class="chiprow" role="group" aria-label="Senaste sökningar"><span class="chips-label">Senaste</span>';
+      r.forEach(function (x, i) { html += '<button type="button" class="chip" data-recent="' + i + '">' + esc(x.name) + "</button>"; });
+      html += "</div>";
+    }
+    if (!current || current.example || !r.length) {
+      html += '<div class="chiprow" role="group" aria-label="Exempel"><span class="chips-label">Prova</span>';
+      EXAMPLES.forEach(function (x) { html += '<button type="button" class="chip" data-ex="' + esc(x) + '">' + esc(x) + "</button>"; });
+      html += "</div>";
+    }
+    chipsEl.innerHTML = html;
+    chipsEl.hidden = !!qEl.value.trim() && !current;
+  }
+  chipsEl.addEventListener("click", function (ev) {
+    var b = ev.target.closest(".chip");
+    if (!b) return;
+    if (b.hasAttribute("data-recent")) {
+      var x = (store("feb.recent") || [])[+b.getAttribute("data-recent")];
+      if (!x) return;
+      if (x.k === "st" && STATIONS_BY_ID[x.id]) choose({ k: "st", st: STATIONS_BY_ID[x.id], name: x.name });
+      else choose(x);
+      return;
+    }
+    var q = b.getAttribute("data-ex");
+    runQuery(q);
+  });
+  function runQuery(q) {
+    qEl.value = q;
+    if (placesState !== "ready") {
+      loadPlaces();
+      pendingQuery = q;
+      update();
+      return;
+    }
+    var r = search(q);
+    if (r.length) choose(r[0]);
+    else update();
+  }
+  var pendingQuery = null;
+
+  // ------------------------------------------------------------ routing
+  function routeFromHash(fromLoad) {
+    var h = (location.hash || "").replace(/^#/, "");
+    if (pendingQuery && placesState === "ready") { var pq = pendingQuery; pendingQuery = null; runQuery(pq); return true; }
+    if (!h) return false;
+    if (h === routedHash) return true;
+    if (h.indexOf("s-") === 0 && STATIONS_BY_ID[h.slice(2)]) {
+      var st = STATIONS_BY_ID[h.slice(2)];
+      choose({ k: "st", st: st, name: st.n }, { silent: true });
+      return true;
+    }
+    if (h.indexOf("q-") === 0) {
+      if (placesState !== "ready") { loadPlaces(); return false; }
+      if (!fromLoad && current) return true;
+      var r = search(h.slice(2).replace(/-/g, " "));
+      if (r.length) { choose(r[0], { silent: true }); return true; }
+    }
+    return false;
+  }
+
+  window.addEventListener("hashchange", function () { routeFromHash(true); });
+
+  // ------------------------------------------------------------ start
+  renderChips();
+  if (!routeFromHash(false)) {
+    if (EXAMPLE) {
+      current = { type: "place", example: true, place: EXAMPLE };
+      render();
+    }
+  }
+  // warm up the place index after first paint
+  if ("requestIdleCallback" in window) requestIdleCallback(loadPlaces, { timeout: 2500 }); else setTimeout(loadPlaces, 800);
+})();
+</script>
