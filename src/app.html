@@ -500,7 +500,7 @@ body.home footer { display: none; }
     sv: { title: "Fram eller bak?", ph: "Vart ska du? T.ex. Södersjukhuset", clear: "Rensa sökningen", sugg: "Sökförslag",
       foot: "Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.",
       f2: "längst fram", f1: "en bit fram", m: "i mitten", b1: "en bit bak", b2: "längst bak", sit: "Sitt",
-      from: "Från", to: "mot", via: "Gå ut via", unreachTop: "Uppgången", unreach: "nås inte härifrån",
+      from: "Från", to: "mot", toCap: "Mot", via: "Gå ut via", unreachTop: "Uppgången", unreach: "nås inte härifrån",
       exit: "Uppgång", toDest: "till målet", other: "Annan uppgång", pick: "Välj uppgång", elevator: "Hiss", map: "Visa uppgången på kartan",
       low: "Osäkert underlag för den här stationen. Titta efter skyltarna på perrongen.",
       auto: "Uträknat från kartdata och ännu inte kontrollerat mot andra källor.",
@@ -513,7 +513,7 @@ body.home footer { display: none; }
     en: { title: "Front or back?", ph: "Where to? E.g. Vasa Museum", clear: "Clear search", sugg: "Suggestions",
       foot: "Map data © OpenStreetMap contributors (ODbL). Not affiliated with SL. Exits can change – check the signs on site.",
       f2: "at the very front", f1: "towards the front", m: "in the middle", b1: "towards the back", b2: "at the very back", sit: "Sit",
-      from: "From", to: "towards", via: "Exit via", unreachTop: "This exit", unreach: "not reachable from here",
+      from: "From", to: "towards", toCap: "Towards", via: "Exit via", unreachTop: "This exit", unreach: "not reachable from here",
       exit: "Exit", toDest: "to your destination", other: "Other exit", pick: "Choose exit", elevator: "Elevator", map: "Show the exit on a map",
       low: "Uncertain data for this station. Look for the signs on the platform.",
       auto: "Calculated from map data, not yet checked against other sources.",
@@ -758,10 +758,9 @@ body.home footer { display: none; }
     var trel = e.t * d.dir;
     var a = answerFor(trel);
     var lines = d.l.map(badge).join("");
-    var to = d.to.join(" · ");
+    var to = d.to.join(" / ");
     var html = '<li class="dir"><div class="dir-top"><div class="dir-text">' +
-      '<div class="dir-from">' + t("from") + ' <b>' + esc(d.from) + '</b><span class="dir-lines">' + lines + "</span></div>" +
-      '<div class="dir-to">' + t("to") + " " + esc(to) + "</div>" + via + "</div>";
+      '<div class="dir-from">' + t("toCap") + ' <b>' + esc(to) + '</b><span class="dir-lines">' + lines + "</span></div>" + via + "</div>";
     if (reach) {
       html += '<div class="answer"><span class="verb">' + t("sit") + '</span><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
     } else {
