@@ -322,14 +322,14 @@ main { padding-block: 10px 24px; }
   flex: none;
   display: inline-flex; align-items: center; gap: 8px;
   min-height: 44px;
-  padding: 6px 12px 6px 6px;
+  padding: 6px 14px;
   border-radius: 12px;
   border: 1px solid var(--line-2);
   background: var(--surface);
   text-align: left;
   max-width: 78vw;
 }
-.xchip[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.xchip[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
 .xchip .letter {
   flex: none;
   width: 28px; height: 28px; border-radius: 8px;
@@ -548,24 +548,6 @@ footer p { margin: 0 0 6px; max-width: 40em; }
   var X0 = 22, X1 = 298;
   function xOf(t) { t = Math.max(-1, Math.min(1, t)); return X0 + (t + 1) / 2 * (X1 - X0); }
 
-  function platformSVG(g, sel, onlySel) {
-    var h = 58;
-    var s = '<svg viewBox="0 0 320 ' + h + '" aria-hidden="true" focusable="false">';
-    s += '<rect x="' + (X0 - 6) + '" y="34" width="' + (X1 - X0 + 12) + '" height="12" rx="3" fill="var(--platform)"/>';
-    s += '<line x1="' + (X0 - 6) + '" y1="47.5" x2="' + (X1 + 6) + '" y2="47.5" stroke="var(--edge)" stroke-width="3" stroke-dasharray="7 5"/>';
-    // order exits by position so letters read left to right
-    g.ex.forEach(function (e, i) {
-      if (onlySel && i !== sel) return;
-      var x = xOf(e.t);
-      var on = i === sel;
-      s += '<line x1="' + x + '" y1="24" x2="' + x + '" y2="34" stroke="' + (on ? "var(--ink)" : "var(--line-2)") + '" stroke-width="2"/>';
-      s += '<rect x="' + (x - 11) + '" y="3" width="22" height="22" rx="6" fill="' + (on ? "var(--accent)" : "var(--surface)") + '" stroke="' + (on ? "var(--accent)" : "var(--line-2)") + '" stroke-width="1.5"/>';
-      s += '<text x="' + x + '" y="19" text-anchor="middle" font-family="Familjen Grotesk, Arial, sans-serif" font-weight="700" font-size="14" fill="' + (on ? "var(--accent-ink)" : "var(--ink)") + '">' + (onlySel ? "↑" : letter(i)) + "</text>";
-    });
-    s += "</svg>";
-    return s;
-  }
-
   function trainSVG(dir, t) {
     // train drawn on the same axis as the platform; dir=+1 means it travels to the right
     var n = 6, gap = 3, w = (X1 - X0 - gap * (n - 1)) / n;
@@ -685,7 +667,7 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       // this direction's platform has its own exit: use the one closest to the chosen exit
       var alt = d.x[0];
       d.x.forEach(function (i) { if (Math.abs(g.ex[i].t - g.ex[sel].t) < Math.abs(g.ex[alt].t - g.ex[sel].t)) alt = i; });
-      via = '<div class="dir-to">Gå ut via uppgång ' + letter(alt) + " · " + esc(g.ex[alt].n) + "</div>";
+      via = '<div class="dir-to">Gå ut via ' + esc(g.ex[alt].n) + "</div>";
       sel = alt; reach = true;
     }
     var e = g.ex[sel];
@@ -699,7 +681,7 @@ footer p { margin: 0 0 6px; max-width: 40em; }
     if (reach) {
       html += '<div class="answer"><span class="verb">Sitt</span><span class="ans">' + a.text + "</span></div></div>" + trainSVG(d.dir, e.t);
     } else {
-      html += '<div class="answer"><span class="verb">Uppgång ' + letter(sel) + '</span><span class="ans" style="font-size:16px">nås inte härifrån</span></div></div>';
+      html += '<div class="answer"><span class="verb">Uppgången</span><span class="ans" style="font-size:16px">nås inte härifrån</span></div></div>';
     }
     return html + "</li>";
   }
@@ -730,7 +712,7 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       g.ex.forEach(function (e, i) {
         var sub = dists ? fmtDist(walkM(dists[i])) + " till målet" : (e.h === 1 ? "Hiss" : "");
         html += '<button type="button" class="xchip" role="radio" aria-checked="' + (i === sel) + '" data-i="' + i + '">' +
-          '<span class="letter">' + letter(i) + '</span><span><span class="xname">' + esc(e.n) + "</span>" +
+          '<span><span class="xname">' + esc(e.n) + "</span>" +
           (sub ? '<span class="xdist">' + esc(sub) + "</span>" : "") + "</span></button>";
       });
       html += "</div>";
@@ -738,15 +720,13 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       html += '<div class="group-title" style="margin-bottom:4px"><span class="pill">Uppgång: <b>' + esc(g.ex[0].n) + "</b></span>" +
         (dists ? ' <span class="pill">' + fmtDist(walkM(dists[0])) + " till målet</span>" : "") + "</div>";
     }
-    html += '<div class="platform">' + platformSVG(g, sel, collapsed) +
-      '<div class="ends"><span>' + (g.L ? "← " + esc(g.L) : "Ändstation") + "</span><span>" + (g.R ? esc(g.R) + " →" : "Ändstation") + "</span></div></div>";
     html += '<ul class="dirs">' + g.d.map(function (d) { return dirRow(g, d, sel); }).join("") + "</ul>";
     var e = g.ex[sel];
     var meta = [];
     if (e.h === 1) meta.push('<span class="pill">Hiss</span>');
     if (e.o) meta.push("<span>" + esc(e.o) + "</span>");
     var p = e.p[0];
-    meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">Visa uppgång ' + letter(sel) + " på kartan</a>");
+    meta.push('<a href="https://www.openstreetmap.org/?mlat=' + p[0] + "&mlon=" + p[1] + "#map=18/" + p[0] + "/" + p[1] + '" target="_blank" rel="noopener">Visa uppgången på kartan</a>');
     html += '<div class="meta-row">' + meta.join("") + "</div>";
     if (st.c === "low") html += '<p class="warn">Osäkert underlag för den här stationen. Titta efter skyltarna på perrongen.</p>';
     else if (st.c === "auto") html += '<p class="warn">Uträknat från kartdata och ännu inte kontrollerat mot andra källor.</p>';
