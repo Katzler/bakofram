@@ -424,7 +424,6 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       </svg>
       <h1>Fram eller bak?</h1>
     </div>
-    <p class="tagline">Sök vart du ska. Du får veta var du ska sitta på tåget för att kliva av närmast rätt uppgång.</p>
   </header>
 </div>
 
@@ -759,7 +758,6 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       html += '<div class="cards">' + cardHTML(st, null, null) + "</div>";
     } else {
       var pl = current.place;
-      if (current.example) html += '<div class="example-note">Exempel – sök på ditt eget mål ovan</div>';
       html += '<div class="dest"><div class="kicker">' + esc(pl.cat || "Plats") + "</div><h2>" + esc(pl.name) + "</h2>" + (pl.sub ? '<div class="dest-sub">' + esc(pl.sub) + "</div>" : "") + "</div>";
       var near = nearbyStations(pl.lat, pl.lon);
       if (!near.pick.length) {
@@ -1056,11 +1054,6 @@ footer p { margin: 0 0 6px; max-width: 40em; }
       r.forEach(function (x, i) { html += '<button type="button" class="chip" data-recent="' + i + '">' + esc(x.name) + "</button>"; });
       html += "</div>";
     }
-    if (!current || current.example || !r.length) {
-      html += '<div class="chiprow" role="group" aria-label="Exempel"><span class="chips-label">Prova</span>';
-      EXAMPLES.forEach(function (x) { html += '<button type="button" class="chip" data-ex="' + esc(x) + '">' + esc(x) + "</button>"; });
-      html += "</div>";
-    }
     chipsEl.innerHTML = html;
     chipsEl.hidden = !!qEl.value.trim() && !current;
   }
@@ -1116,10 +1109,7 @@ footer p { margin: 0 0 6px; max-width: 40em; }
   // ------------------------------------------------------------ start
   renderChips();
   if (!routeFromHash(false)) {
-    if (EXAMPLE) {
-      current = { type: "place", example: true, place: EXAMPLE };
-      render();
-    }
+    /* start with just the search field */
   }
   // warm up the place index after first paint
   if ("requestIdleCallback" in window) requestIdleCallback(loadPlaces, { timeout: 2500 }); else setTimeout(loadPlaces, 800);
