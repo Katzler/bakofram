@@ -6,6 +6,7 @@ Finns på svenska och engelska (växla med SV/EN uppe till höger; svenska är f
 
 - `index.html` – sidan (stationsdata inbäddad)
 - `places.json` – sökindex med platser, gator och adresser
+- `extra_places.py` – handplockade tillägg (platser som saknas i OSM-utdraget + extra sökalias); körs av `build.py`
 - `src/app.html` – källkod för sidan; `build.py` bygger om från datapipelinen
 
 Data: © OpenStreetMap-bidragsgivare (ODbL). Uppgångarna är granskade mot bl.a. Wikipedia. Inte kopplad till SL.

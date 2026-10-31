@@ -19,6 +19,7 @@ subprocess.run([sys.executable, os.path.join(PIPE, "build_stations.py"), OSM, VE
 places_json = os.path.join(DIST, "places.json")
 if "--skip-places" not in sys.argv or not os.path.exists(places_json):
     subprocess.run([sys.executable, os.path.join(PIPE, "build_places.py"), OSM, places_json], check=True)
+    subprocess.run([sys.executable, os.path.join(HERE, "extra_places.py"), places_json], check=True)
 
 data = json.load(open(st_json))
 places = json.load(open(places_json))
