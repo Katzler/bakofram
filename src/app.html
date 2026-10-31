@@ -465,6 +465,25 @@ main { padding-block: 10px 24px; }
 .mapview canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 .mapclose { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px; }
 
+/* ---------- first-visit guide */
+.tour { position: fixed; inset: 0; z-index: 90; display: grid; align-items: end; justify-items: center; padding: 16px; background: rgba(8, 12, 18, .45); }
+.tour[hidden] { display: none; }
+.tour-card {
+  width: 100%; max-width: 420px;
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--surface); color: var(--ink);
+  border-radius: 18px; box-shadow: var(--shadow);
+  padding: 20px 20px 16px;
+}
+.tour-card h2 { margin: 0 0 10px; font-family: var(--font-display); font-size: 21px; letter-spacing: -0.01em; }
+.tour-card ol { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 8px; color: var(--ink-2); font-size: 15px; }
+.tour-card b { color: var(--ink); }
+.tour-ok { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 16px; }
+@media (min-width: 700px) { .tour { align-items: center; } }
+@media (prefers-reduced-motion: no-preference) {
+  .tour-card { animation: rise .3s ease; }
+}
+
 /* ---------- how it works + footer */
 .how { margin-top: 26px; display: grid; gap: 10px; }
 .how h2 { font-family: var(--font-display); font-size: 19px; margin: 0; letter-spacing: -0.01em; }
@@ -565,6 +584,14 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
   </button>
 </div>
 
+<div id="tour" class="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
+  <div class="tour-card">
+    <h2 id="tourTitle"></h2>
+    <ol id="tourList"></ol>
+    <button type="button" id="tourOk" class="tour-ok"></button>
+  </div>
+</div>
+
 <noscript><div class="wrap"><p class="empty">Sidan behöver JavaScript för att söka.</p></div></noscript>
 
 <script id="stations-data" type="application/json">/*__STATIONS__*/</script>
@@ -591,7 +618,9 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
       fromPh: "Var är du? (valfritt)", me: "Min plats", locating: "Söker…", geoFail: "Kunde inte hitta din plats. Skriv var du är i stället.",
       clearFrom: "Rensa startpunkten", trip: "Resa", fromW: "från", change: "byte", changes: "byten", direct: "inga byten",
       walkTo: "Gå till", board: "Kliv på", offAt: "Kliv av vid", stop: "station", stops: "stationer",
-      changeTo: "Byt till", here: "här", walkNear: "Det är nära – ca", walkNear2: "min promenad.", walkBest: "Bäst att gå – ca", same: "Du är redan framme.",
+      changeTo: "Byt till", here: "här", walkNear: "Det är nära – ca", walkNear2: "min promenad.", walkBest: "Bäst att gå – ca", tourT: "Nytt: planera hela resan", tourOk: "Okej",
+      tour: ["Skriv <b>var du är</b> eller tryck <b>Min plats</b>, och sedan vart du ska.", "Du får rutten med byten och <b>var du ska sitta på varje tåg</b>.",
+        "Kartikonen uppe till höger visar <b>hela spårnätet</b>. Tryck på en station för att välja den.", "<b>Öppna SL-appen</b> längst ner tar dig till biljetten."], same: "Du är redan framme.",
       noRoute: "Hittade ingen resa med spårtrafik.", showMap: "Visa på kartan", sl: "Öppna SL-appen", slSub: "biljett",
       railMap: "Karta över spårtrafiken", mapClose: "Stäng kartan", any: "valfri vagn" },
     en: { title: "Front or back?", ph: "Where to? E.g. Vasa Museum", clear: "Clear search", sugg: "Suggestions",
@@ -610,7 +639,9 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
       fromPh: "Where are you? (optional)", me: "My location", locating: "Locating…", geoFail: "Couldn't find your location. Type where you are instead.",
       clearFrom: "Clear starting point", trip: "Trip", fromW: "from", change: "change", changes: "changes", direct: "no changes",
       walkTo: "Walk to", board: "Board", offAt: "Get off at", stop: "stop", stops: "stops",
-      changeTo: "Change to", here: "here", walkNear: "It's close – about", walkNear2: "min walk.", walkBest: "Best to walk – about", same: "You're already there.",
+      changeTo: "Change to", here: "here", walkNear: "It's close – about", walkNear2: "min walk.", walkBest: "Best to walk – about", tourT: "New: plan the whole trip", tourOk: "Got it",
+      tour: ["Type <b>where you are</b> or tap <b>My location</b>, then where you're going.", "You get the route with changes and <b>where to sit on every train</b>.",
+        "The map icon at the top right shows <b>the whole rail network</b>. Tap a station to pick it.", "<b>Open the SL app</b> at the bottom takes you to your ticket."], same: "You're already there.",
       noRoute: "No rail trip found.", showMap: "Show on map", sl: "Open the SL app", slSub: "ticket",
       railMap: "Rail map", mapClose: "Close map", any: "any car" }
   };
@@ -1780,11 +1811,26 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
     LANG = b.getAttribute("data-lang");
     store0("feb.lang", LANG);
     applyStatic();
+    if (!tourEl.hidden) showTour();
     if (FROM && FROM.k === "me") { FROM.name = t("me"); fEl.value = FROM.name; }
     if (current) { var keepSel = selState, keepOpen = openState; render(); selState = keepSel; openState = keepOpen; }
     renderChips();
     if (!sugEl.hidden) update();
   });
+
+  // ------------------------------------------------------------ first-visit guide
+  var tourEl = $("#tour");
+  function showTour() {
+    $("#tourTitle").textContent = t("tourT");
+    $("#tourList").innerHTML = t("tour").map(function (x) { return "<li>" + x + "</li>"; }).join("");
+    $("#tourOk").textContent = t("tourOk");
+    tourEl.hidden = false;
+    $("#tourOk").focus({ preventScroll: true });
+  }
+  function hideTour() { tourEl.hidden = true; store("feb.tour1", 1); }
+  $("#tourOk").addEventListener("click", hideTour);
+  tourEl.addEventListener("click", function (ev) { if (ev.target === tourEl) hideTour(); });
+  tourEl.addEventListener("keydown", function (ev) { if (ev.key === "Escape") hideTour(); });
 
   // ------------------------------------------------------------ start
   document.body.classList.add("home");
@@ -1792,6 +1838,7 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
   if (!routeFromHash(false)) {
     /* start with just the search field */
   }
+  if (!store("feb.tour1")) showTour();
   // warm up the place index after first paint
   if ("requestIdleCallback" in window) requestIdleCallback(loadPlaces, { timeout: 2500 }); else setTimeout(loadPlaces, 800);
 })();
