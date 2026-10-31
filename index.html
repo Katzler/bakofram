@@ -606,7 +606,9 @@ body.home footer { display: none; }
     var cols = {};
     l.forEach(function (x) { cols[LINE_COLOR[x]] = 1; });
     var k = Object.keys(cols);
-    return k.length === 1 ? k[0] : "var(--ink-2)";
+    if (k.length === 1) return k[0];
+    var n = k.length, stops = k.map(function (c, i) { return c + " " + (i * 100 / n) + "% " + ((i + 1) * 100 / n) + "%"; });
+    return "linear-gradient(90deg," + stops.join(",") + ")";
   }
 
   // ------------------------------------------------------------ utils
@@ -802,7 +804,7 @@ body.home footer { display: none; }
     }
     var collapsed = dists && g.ex.length > 1 && !openState[key];
     if (collapsed) {
-      html += '<div class="bestexit"><span class="pill">' + t("exit") + ': <b>' + esc(g.ex[sel].n) + "</b></span></div>";
+      // exit name intentionally not shown
     } else if (g.ex.length > 1) {
       html += '<div class="exitpick" role="radiogroup" aria-label="' + t("pick") + '">';
       g.ex.forEach(function (e, i) {
@@ -813,8 +815,7 @@ body.home footer { display: none; }
       });
       html += "</div>";
     } else if (g.ex.length === 1) {
-      html += '<div class="group-title" style="margin-bottom:4px"><span class="pill">' + t("exit") + ": <b>" + esc(g.ex[0].n) + "</b></span>" +
-        "</div>";
+      // single exit: name not shown
     }
     html += '<ul class="dirs">' + g.d.map(function (d) { return dirRow(g, d, sel); }).join("") + "</ul>";
     var e = g.ex[sel];
@@ -831,7 +832,7 @@ body.home footer { display: none; }
   function cardHTML(st, dest, dist) {
     var head = '<div class="card-head"><span class="mode" style="background:' + stationColor(st) + '">' + SYS[st.s].letter + "</span>" +
       '<div class="card-title"><h3>' + esc(st.n) + '</h3><div class="card-meta">' + sysName(st.s) + " " + st.lines.map(badge).join("") + "</div></div>";
-    if (dist != null) head += '<div class="walk"><strong>' + fmtDist(walkM(dist)) + "</strong><span>" + t("approx") + " " + walkMin(dist) + " " + t("walk") + "</span></div>";
+    if (dist != null) head += '<div class="walk"><strong>' + fmtDist(walkM(dist)) + "</strong></div>";
     head += "</div>";
     var body = st.g.map(function (g, gi) { return groupHTML(st, gi, dest); }).join("");
     return '<section class="card" data-st="' + esc(st.id) + '">' + head + body + "</section>";
