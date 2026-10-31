@@ -2,6 +2,8 @@
 
 Sök vart du ska i Stockholmsområdet och se om du ska sitta längst fram, i mitten eller längst bak på tåget för att kliva av närmast rätt uppgång. Täcker tunnelbanan, pendeltåget, Roslagsbanan, Saltsjöbanan, Tvärbanan, Lidingöbanan och Nockebybanan (261 stationer).
 
+Skriv även var du är (eller tryck **Min plats**) så blir det en resa: appen räknar fram rutten på spårnätet, med byten, och säger var du ska sitta på varje tåg – närmast bytet eller närmast målet. Kartikonen uppe till höger visar hela spårnätet (nyp/scrolla för att zooma, tryck på en station för att välja den). Knappen **Öppna SL-appen** tar dig till biljetten.
+
 Finns på svenska och engelska (växla med SV/EN uppe till höger; svenska är förvalt). *In English: search for any place in Stockholm and see whether to sit at the front, middle or back of the train to get off right by the best exit.*
 
 - `index.html` – sidan (stationsdata inbäddad)

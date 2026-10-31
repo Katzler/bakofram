@@ -125,8 +125,17 @@ a { color: inherit; }
 /* ---------- masthead */
 .masthead { padding-block: 18px 6px; }
 .masthead { position: relative; }
+.tools { position: absolute; top: 10px; right: 0; z-index: 1; display: flex; gap: 8px; align-items: center; }
+.roundbtn {
+  width: 42px; height: 42px; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid var(--line-2);
+  background: var(--surface); color: var(--ink-2);
+  box-shadow: var(--shadow);
+}
+.roundbtn svg { width: 20px; height: 20px; }
 .lang {
-  position: absolute; top: 10px; right: 0; z-index: 1;
+  position: relative;
   display: grid; grid-template-columns: 1fr 1fr;
   padding: 3px; border-radius: 999px;
   background: var(--surface); border: 1px solid var(--line-2);
@@ -196,8 +205,27 @@ a { color: inherit; }
   font-size: 18px;
   font-family: var(--font-body);
 }
-#q::placeholder { color: var(--muted); opacity: 1; }
-#q::-webkit-search-cancel-button { display: none; }
+#q::placeholder, #from::placeholder { color: var(--muted); opacity: 1; }
+#q::-webkit-search-cancel-button, #from::-webkit-search-cancel-button { display: none; }
+.field.small { margin-bottom: 8px; border-width: 1px; box-shadow: none; }
+.field.small:focus-within { border-color: var(--ink); }
+#from {
+  flex: 1; min-width: 0; height: 46px;
+  border: 0; outline: none; background: transparent;
+  padding: 0 8px 0 12px;
+  font-size: 16px; font-family: var(--font-body);
+}
+.field .dot { flex: none; width: 10px; height: 10px; margin-left: 20px; border-radius: 50%; border: 2.5px solid var(--muted); }
+.field.small .clear { width: 42px; height: 42px; }
+.locate {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px; margin-right: 6px; padding: 0 12px;
+  border: 0; border-radius: 999px;
+  background: var(--surface-2); color: var(--ink-2);
+  font-size: 14px; font-weight: 700; white-space: nowrap;
+}
+.locate svg { width: 16px; height: 16px; }
+.locate:disabled { opacity: .6; }
 .clear {
   flex: none;
   width: 48px; height: 48px;
@@ -414,6 +442,29 @@ main { padding-block: 10px 24px; }
   font-weight: 700;
 }
 
+/* ---------- trip */
+.legs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 6px; color: var(--muted); font-size: 15px; }
+.step b { color: var(--ink-2); }
+.step .badge { min-width: 22px; height: 18px; font-size: 11.5px; border-radius: 5px; padding: 0 4px; }
+.leg .dirs { margin-top: 4px; }
+.linkbtn { border: 0; padding: 0; background: none; color: var(--ink-2); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.slbtn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px; margin-top: 16px;
+  border: 1px solid var(--line-2); border-radius: 12px;
+  background: var(--surface); color: var(--ink);
+  font-weight: 700; text-decoration: none;
+}
+.slbtn svg { width: 20px; height: 20px; }
+.slbtn:active { background: var(--surface-2); }
+
+/* ---------- map */
+.mapview { position: fixed; inset: 0; z-index: 100; background: var(--bg); }
+.mapview[hidden] { display: none; }
+.mapview canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.mapclose { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px; }
+
 /* ---------- how it works + footer */
 .how { margin-top: 26px; display: grid; gap: 10px; }
 .how h2 { font-family: var(--font-display); font-size: 19px; margin: 0; letter-spacing: -0.01em; }
@@ -427,6 +478,8 @@ body.home .masthead { padding-top: max(24px, calc(34vh - 90px)); }
 body.home .brand { justify-content: center; }
 body.home .chiprow { justify-content: center; }
 body.home footer { display: none; }
+body:not(.home) .brand svg { display: none; }
+body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
 @media (min-width: 700px) {
   .masthead { padding-block: 34px 8px; }
   .dest h2 { font-size: 30px; }
@@ -440,10 +493,15 @@ body.home footer { display: none; }
 
 <div class="wrap">
   <header class="masthead">
-    <div class="lang" role="radiogroup" aria-label="Språk / Language">
-      <span class="lang-thumb" aria-hidden="true"></span>
-      <button type="button" role="radio" data-lang="sv" aria-checked="true" aria-label="Svenska">SV</button>
-      <button type="button" role="radio" data-lang="en" aria-checked="false" aria-label="English">EN</button>
+    <div class="tools">
+      <button type="button" id="mapBtn" class="roundbtn" aria-label="Karta över spårtrafiken">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13.5L9 17.5l6 2.5 6-2.5V4L15 6.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>
+      </button>
+      <div class="lang" role="radiogroup" aria-label="Språk / Language">
+        <span class="lang-thumb" aria-hidden="true"></span>
+        <button type="button" role="radio" data-lang="sv" aria-checked="true" aria-label="Svenska">SV</button>
+        <button type="button" role="radio" data-lang="en" aria-checked="false" aria-label="English">EN</button>
+      </div>
     </div>
     <div class="brand">
       <svg viewBox="0 0 46 20" aria-hidden="true">
@@ -463,8 +521,21 @@ body.home footer { display: none; }
 <div class="searchbar">
   <div class="wrap">
     <form id="searchForm" role="search" autocomplete="off">
+      <label class="sr-only" for="from">Var är du?</label>
+      <div class="field small" id="fromField">
+        <span class="dot" aria-hidden="true"></span>
+        <input id="from" type="search" name="from" inputmode="search" enterkeyhint="next" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Var är du? (valfritt)" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+        <button type="button" id="locBtn" class="locate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          <span id="locText">Min plats</span>
+        </button>
+        <button type="button" id="fromClear" class="clear" aria-label="Rensa startpunkten" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
       <label class="sr-only" for="q">Vart ska du?</label>
-      <div class="field">
+      <div class="field" id="toField">
         <svg class="glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
         <input id="q" type="search" name="q" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                placeholder="Vart ska du? T.ex. Södersjukhuset" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
@@ -485,6 +556,13 @@ body.home footer { display: none; }
   <footer>
     <p id="footText">Kartdata © OpenStreetMap-bidragsgivare (ODbL). Inte kopplad till SL. Uppgångar kan ändras – kolla skyltarna på plats.</p>
   </footer>
+</div>
+
+<div id="mapView" class="mapview" role="dialog" aria-modal="true" aria-label="Karta" hidden>
+  <canvas id="mapCanvas"></canvas>
+  <button type="button" id="mapClose" class="roundbtn mapclose" aria-label="Stäng kartan">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
 </div>
 
 <noscript><div class="wrap"><p class="empty">Sidan behöver JavaScript för att söka.</p></div></noscript>
@@ -509,7 +587,13 @@ body.home footer { display: none; }
       djur: "Djurgården nås lättast med spårvagn 7, buss 67 eller färjan från Slussen.",
       recent: "Senaste", recentAria: "Senaste sökningar", loading: "Laddar platser…", loadingMore: "Laddar fler platser…",
       notFound: "Hittade inget. Prova ett stationsnamn, en gata eller ett ställe.", near: "nära", street: "Gata", address: "Adress", place: "Plats",
-      langBtn: "EN", langAria: "Switch to English" },
+      langBtn: "EN", langAria: "Switch to English",
+      fromPh: "Var är du? (valfritt)", me: "Min plats", locating: "Söker…", geoFail: "Kunde inte hitta din plats. Skriv var du är i stället.",
+      clearFrom: "Rensa startpunkten", trip: "Resa", fromW: "från", change: "byte", changes: "byten", direct: "inga byten",
+      walkTo: "Gå till", board: "Kliv på", offAt: "Kliv av vid", stop: "station", stops: "stationer",
+      changeTo: "Byt till", here: "här", walkNear: "Det är nära – ca", walkNear2: "min promenad.", walkBest: "Bäst att gå – ca", same: "Du är redan framme.",
+      noRoute: "Hittade ingen resa med spårtrafik.", showMap: "Visa på kartan", sl: "Öppna SL-appen", slSub: "biljett",
+      railMap: "Karta över spårtrafiken", mapClose: "Stäng kartan", any: "valfri vagn" },
     en: { title: "Front or back?", ph: "Where to? E.g. Vasa Museum", clear: "Clear search", sugg: "Suggestions",
       foot: "Map data © OpenStreetMap contributors (ODbL). Not affiliated with SL. Exits can change – check the signs on site.",
       f2: "at the very front", f1: "towards the front", m: "in the middle", b1: "towards the back", b2: "at the very back", sit: "Sit",
@@ -522,7 +606,13 @@ body.home footer { display: none; }
       djur: "Djurgården is easiest to reach by tram 7, bus 67 or the ferry from Slussen.",
       recent: "Recent", recentAria: "Recent searches", loading: "Loading places…", loadingMore: "Loading more places…",
       notFound: "Nothing found. Try a station, a street or a place.", near: "near", street: "Street", address: "Address", place: "Place",
-      langBtn: "SV", langAria: "Byt till svenska" }
+      langBtn: "SV", langAria: "Byt till svenska",
+      fromPh: "Where are you? (optional)", me: "My location", locating: "Locating…", geoFail: "Couldn't find your location. Type where you are instead.",
+      clearFrom: "Clear starting point", trip: "Trip", fromW: "from", change: "change", changes: "changes", direct: "no changes",
+      walkTo: "Walk to", board: "Board", offAt: "Get off at", stop: "stop", stops: "stops",
+      changeTo: "Change to", here: "here", walkNear: "It's close – about", walkNear2: "min walk.", walkBest: "Best to walk – about", same: "You're already there.",
+      noRoute: "No rail trip found.", showMap: "Show on map", sl: "Open the SL app", slSub: "ticket",
+      railMap: "Rail map", mapClose: "Close map", any: "any car" }
   };
   function t(k) { return STR[LANG][k]; }
   var SYS_EN = { metro: "Metro", pendel: "Commuter train", roslag: "Roslagsbanan (local train)", saltsjo: "Saltsjöbanan (local train)",
@@ -560,6 +650,13 @@ body.home footer { display: none; }
     document.getElementById("clearBtn").setAttribute("aria-label", t("clear"));
     document.getElementById("suggest").setAttribute("aria-label", t("sugg"));
     document.getElementById("footText").textContent = t("foot");
+    var fr = document.getElementById("from");
+    fr.placeholder = t("fromPh"); fr.setAttribute("aria-label", t("fromPh"));
+    document.getElementById("locText").textContent = t("me");
+    document.getElementById("fromClear").setAttribute("aria-label", t("clearFrom"));
+    document.getElementById("mapBtn").setAttribute("aria-label", t("railMap"));
+    document.getElementById("mapClose").setAttribute("aria-label", t("mapClose"));
+    document.getElementById("mapView").setAttribute("aria-label", t("railMap"));
     var lg = document.querySelector(".lang");
     lg.setAttribute("data-lang", LANG);
     Array.prototype.forEach.call(lg.querySelectorAll("button"), function (b) { b.setAttribute("aria-checked", b.getAttribute("data-lang") === LANG ? "true" : "false"); });
@@ -828,7 +925,9 @@ body.home footer { display: none; }
   function render() {
     if (!current) return;
     var html = "";
-    if (current.type === "station") {
+    if (FROM) {
+      html += renderTrip(current.type === "place" ? current.place : null, current.type === "station" ? current.st : null);
+    } else if (current.type === "station") {
       var st = current.st;
       html += '<div class="dest"><div class="kicker">' + t("station") + "</div><h2>" + esc(st.n) + '</h2><div class="dest-sub">' + t("pickHelp") + "</div></div>";
       html += '<div class="cards">' + cardHTML(st, null, null) + "</div>";
@@ -846,7 +945,8 @@ body.home footer { display: none; }
         html += '<div class="cards">' + near.pick.map(function (r) { return cardHTML(r.st, pl, r.d); }).join("") + "</div>";
       }
     }
-    result.innerHTML = html;
+    if (!FROM) lastTrip = null;
+    result.innerHTML = html + slHTML();
     document.body.classList.toggle("home", !current);
     revealSelected(result);
   }
@@ -860,6 +960,9 @@ body.home footer { display: none; }
   }
 
   result.addEventListener("click", function (ev) {
+    if (ev.target.closest("[data-showmap]")) { openMap(true); return; }
+    var tc = ev.target.closest("[data-trip]");
+    if (tc) { tripSel = +tc.getAttribute("data-trip"); render(); var nb0 = result.querySelector('[data-trip="' + tripSel + '"]'); if (nb0) nb0.focus({ preventScroll: true }); return; }
     var more = ev.target.closest(".more-exits");
     if (more) {
       var g0 = more.closest(".group");
@@ -1004,6 +1107,8 @@ body.home footer { display: none; }
 
   // ------------------------------------------------------------ search UI
   var qEl = $("#q"), sugEl = $("#suggest"), clearBtn = $("#clearBtn"), chipsEl = $("#chips");
+  var fEl = $("#from"), locBtn = $("#locBtn"), fClear = $("#fromClear");
+  var activeEl = qEl;
   var opts = [], active = -1;
 
   var ICON = {
@@ -1033,7 +1138,8 @@ body.home footer { display: none; }
   }
   function showSug(show) {
     sugEl.hidden = !show;
-    qEl.setAttribute("aria-expanded", show ? "true" : "false");
+    qEl.setAttribute("aria-expanded", show && activeEl === qEl ? "true" : "false");
+    fEl.setAttribute("aria-expanded", show && activeEl === fEl ? "true" : "false");
     if (show) fitSuggest();
   }
   // keep the suggestion list above the on-screen keyboard
@@ -1045,9 +1151,11 @@ body.home footer { display: none; }
     document.documentElement.style.setProperty("--sug-max", avail + "px");
   }
   if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { if (!sugEl.hidden) fitSuggest(); });
+  function syncFrom() { locBtn.hidden = !!fEl.value; fClear.hidden = !fEl.value; }
   function update() {
-    var q = qEl.value;
-    clearBtn.hidden = !q;
+    var q = activeEl.value;
+    clearBtn.hidden = !qEl.value;
+    syncFrom();
     if (!q.trim()) { opts = []; showSug(false); renderChips(); return; }
     loadPlaces();
     opts = search(q);
@@ -1059,21 +1167,21 @@ body.home footer { display: none; }
       html += '<li class="opt-empty loading">' + t("loadingMore") + "</li>";
     }
     sugEl.innerHTML = html;
-    qEl.setAttribute("aria-activedescendant", active >= 0 ? "opt-" + active : "");
+    activeEl.setAttribute("aria-activedescendant", active >= 0 ? "opt-" + active : "");
     showSug(true);
   }
   function setActive(i) {
     if (!opts.length) return;
     active = (i + opts.length) % opts.length;
     Array.prototype.forEach.call(sugEl.querySelectorAll(".opt"), function (li, j) { li.setAttribute("aria-selected", j === active ? "true" : "false"); });
-    qEl.setAttribute("aria-activedescendant", "opt-" + active);
+    activeEl.setAttribute("aria-activedescendant", "opt-" + active);
     var li = sugEl.querySelector("#opt-" + active);
     if (li) li.scrollIntoView({ block: "nearest" });
   }
 
   function choose(e, opts2) {
     opts2 = opts2 || {};
-    selState = {}; openState = {};
+    selState = {}; openState = {}; tripSel = null;
     if (e.k === "st") {
       current = { type: "station", st: e.st };
       setHash("s-" + e.st.id);
@@ -1102,19 +1210,52 @@ body.home footer { display: none; }
     try { history.replaceState(null, "", "#" + h); } catch (e) { /* ignore */ }
   }
 
-  qEl.addEventListener("input", update);
-  qEl.addEventListener("focus", function () { loadPlaces(); if (qEl.value.trim()) update(); });
-  qEl.addEventListener("keydown", function (ev) {
-    if (ev.key === "ArrowDown") { ev.preventDefault(); setActive(active + 1); }
-    else if (ev.key === "ArrowUp") { ev.preventDefault(); setActive(active - 1); }
-    else if (ev.key === "Enter") { ev.preventDefault(); if (opts[active]) choose(opts[active]); }
-    else if (ev.key === "Escape") { showSug(false); }
+  function pick(e) { if (activeEl === fEl) setFrom(e); else choose(e); }
+  function setFrom(e) {
+    FROM = e ? { name: e.name, k: e.k, st: e.k === "st" ? e.st : null, lat: e.k === "st" ? e.st.ll[0] : e.lat, lon: e.k === "st" ? e.st.ll[1] : e.lon } : null;
+    fEl.value = FROM ? FROM.name : "";
+    syncFrom();
+    showSug(false);
+    tripSel = null;
+    if (current) { render(); fEl.blur(); }
+    else if (FROM) qEl.focus();
+  }
+  [qEl, fEl].forEach(function (el) {
+    el.addEventListener("input", function () {
+      if (el === fEl && FROM) { FROM = null; if (current) render(); }
+      update();
+    });
+    el.addEventListener("focus", function () {
+      activeEl = el;
+      el.closest(".field").after(sugEl);
+      loadPlaces();
+      if (el.value.trim() && !(el === fEl && FROM)) update(); else showSug(false);
+    });
+    el.addEventListener("keydown", function (ev) {
+      if (ev.key === "ArrowDown") { ev.preventDefault(); setActive(active + 1); }
+      else if (ev.key === "ArrowUp") { ev.preventDefault(); setActive(active - 1); }
+      else if (ev.key === "Enter") { ev.preventDefault(); if (!sugEl.hidden && opts[active]) pick(opts[active]); else if (el === fEl) qEl.focus(); }
+      else if (ev.key === "Escape") { showSug(false); }
+    });
   });
-  $("#searchForm").addEventListener("submit", function (ev) { ev.preventDefault(); if (opts[active]) choose(opts[active]); });
+  $("#searchForm").addEventListener("submit", function (ev) { ev.preventDefault(); if (opts[active]) pick(opts[active]); });
   sugEl.addEventListener("mousedown", function (ev) { ev.preventDefault(); });
   sugEl.addEventListener("click", function (ev) {
     var li = ev.target.closest(".opt");
-    if (li) choose(opts[+li.getAttribute("data-i")]);
+    if (li) pick(opts[+li.getAttribute("data-i")]);
+  });
+  fClear.addEventListener("click", function () { setFrom(null); if (!current) fEl.focus(); });
+  locBtn.addEventListener("click", function () {
+    if (!navigator.geolocation) { alert(t("geoFail")); return; }
+    locBtn.disabled = true; $("#locText").textContent = t("locating");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      locBtn.disabled = false; $("#locText").textContent = t("me");
+      activeEl = fEl;
+      setFrom({ k: "me", name: t("me"), lat: pos.coords.latitude, lon: pos.coords.longitude });
+    }, function () {
+      locBtn.disabled = false; $("#locText").textContent = t("me");
+      alert(t("geoFail"));
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
   });
   clearBtn.addEventListener("click", function () { qEl.value = ""; update(); qEl.focus(); });
   document.addEventListener("click", function (ev) { if (!ev.target.closest("#searchForm")) showSug(false); });
@@ -1166,6 +1307,452 @@ body.home footer { display: none; }
   }
   var pendingQuery = null;
 
+  // ------------------------------------------------------------ rail network (built from each platform's neighbours)
+  function nbNames(s) { return s ? String(s).split(" / ").map(function (x) { return x.trim(); }).filter(Boolean) : []; }
+  var BYNAME = {};
+  STATIONS.forEach(function (st) { (BYNAME[st.n] = BYNAME[st.n] || []).push(st); });
+  var NODES = [], NODE_OF = {};
+  STATIONS.forEach(function (st) {
+    st.g.forEach(function (g, gi) {
+      var n = { i: NODES.length, st: st, gi: gi, g: g, adj: [], xf: [] };
+      NODES.push(n); NODE_OF[st.id + ":" + gi] = n;
+    });
+  });
+  var SPEED = { metro: 600, pendel: 900 }; // metres per minute, roughly, stops included below
+  NODES.forEach(function (n) {
+    ["L", "R"].forEach(function (side) {
+      nbNames(n.g[side]).forEach(function (nm) {
+        (BYNAME[nm] || []).forEach(function (st2) {
+          st2.g.forEach(function (g2, gi2) {
+            var common = n.g.lines.filter(function (l) { return g2.lines.indexOf(l) >= 0; });
+            if (!common.length) return;
+            if (nbNames(g2.L).indexOf(n.st.n) < 0 && nbNames(g2.R).indexOf(n.st.n) < 0) return;
+            var m = hav(n.st.ll[0], n.st.ll[1], st2.ll[0], st2.ll[1]);
+            n.adj.push({ to: NODE_OF[st2.id + ":" + gi2], lines: common, dir: side === "R" ? 1 : -1, c: 0.8 + m / (SPEED[n.st.s] || 450) });
+          });
+        });
+      });
+    });
+  });
+  function exitGap(ga, gb) {
+    var best = Infinity;
+    ga.ex.forEach(function (ea) { ea.p.forEach(function (p) {
+      gb.ex.forEach(function (eb) { eb.p.forEach(function (q) { var d = hav(p[0], p[1], q[0], q[1]); if (d < best) best = d; }); });
+    }); });
+    return best;
+  }
+  // changes: other platforms at the same station, or a nearby station on foot
+  NODES.forEach(function (a) {
+    NODES.forEach(function (b) {
+      if (a === b) return;
+      var d0 = hav(a.st.ll[0], a.st.ll[1], b.st.ll[0], b.st.ll[1]);
+      if (a.st !== b.st && d0 > 400) return;
+      var gap = exitGap(a.g, b.g);
+      if (!isFinite(gap)) gap = d0;
+      a.xf.push({ to: b, m: gap, c: 2 + walkMin(gap) });
+    });
+  });
+  var LIDX = {}, NL = 0;
+  STATIONS.forEach(function (st) { st.lines.forEach(function (l) { if (LIDX[l] == null) LIDX[l] = NL++; }); });
+  var FOOT = 63, XPEN = 8; // state for "on foot"; minutes added per change
+
+  // minutes on foot to or from a station; long walks count extra so a short ride wins over a long walk
+  function accessC(m) { return walkMin(m) + Math.max(0, m - 500) / 80; }
+  function endpoints(p) {
+    if (p.st) return p.st.g.map(function (g, gi) { return { n: NODE_OF[p.st.id + ":" + gi], c: 0, m: 0 }; });
+    var out = [], best = null;
+    STATIONS.forEach(function (st) {
+      if (Math.abs(st.ll[0] - p.lat) > 0.03 || Math.abs(st.ll[1] - p.lon) > 0.06) return;
+      st.g.forEach(function (g, gi) {
+        var d = Infinity;
+        g.ex.forEach(function (e) { d = Math.min(d, exitDist(e, p.lat, p.lon)); });
+        if (!isFinite(d)) d = hav(p.lat, p.lon, st.ll[0], st.ll[1]);
+        var r = { n: NODE_OF[st.id + ":" + gi], c: accessC(d), m: d };
+        if (!best || d < best.m) best = r;
+        if (d <= 1500) out.push(r);
+      });
+    });
+    if (!out.length) {
+      var nr = nearbyStations(p.lat, p.lon).nearest;
+      if (nr) nr.st.g.forEach(function (g, gi) { out.push({ n: NODE_OF[nr.st.id + ":" + gi], c: accessC(nr.d), m: nr.d }); });
+    }
+    return out;
+  }
+
+  function planTrip(from, dest) {
+    var starts = endpoints(from), ends = endpoints(dest);
+    var endBy = {};
+    ends.forEach(function (e) { if (!endBy[e.n.i] || e.c < endBy[e.n.i].c) endBy[e.n.i] = e; });
+    var dist = {}, prev = {}, heap = [];
+    function push(k, c) {
+      heap.push([c, k]);
+      var i = heap.length - 1;
+      while (i > 0) { var pi = (i - 1) >> 1; if (heap[pi][0] <= heap[i][0]) break; var tmp = heap[pi]; heap[pi] = heap[i]; heap[i] = tmp; i = pi; }
+    }
+    function pop() {
+      var top = heap[0], last = heap.pop();
+      if (heap.length) {
+        heap[0] = last;
+        var i = 0;
+        for (;;) {
+          var l = 2 * i + 1, r = l + 1, m = i;
+          if (l < heap.length && heap[l][0] < heap[m][0]) m = l;
+          if (r < heap.length && heap[r][0] < heap[m][0]) m = r;
+          if (m === i) break;
+          var tmp = heap[m]; heap[m] = heap[i]; heap[i] = tmp; i = m;
+        }
+      }
+      return top;
+    }
+    function relax(k, c, from, via) {
+      if (dist[k] != null && dist[k] <= c) return;
+      dist[k] = c; prev[k] = { k: from, via: via }; push(k, c);
+    }
+    starts.forEach(function (s) { relax(s.n.i * 64 + FOOT, s.c, null, { start: s }); });
+    var direct = hav(from.lat, from.lon, dest.lat, dest.lon);
+    var best = accessC(direct), bestK = null;
+    while (heap.length) {
+      var top = pop(), c = top[0], k = top[1];
+      if (c > dist[k]) continue;
+      if (c >= best) break;
+      var n = NODES[Math.floor(k / 64)], li = k % 64;
+      if (endBy[n.i] && c + endBy[n.i].c < best) { best = c + endBy[n.i].c; bestK = k; }
+      n.adj.forEach(function (e) {
+        e.lines.forEach(function (l) {
+          var lj = LIDX[l];
+          relax(e.to.i * 64 + lj, c + e.c + (li === FOOT ? 0 : lj === li ? 0 : XPEN), k, { e: e, l: l, from: n });
+        });
+      });
+      n.xf.forEach(function (x) { relax(x.to.i * 64 + FOOT, c + x.c + (li === FOOT ? 0 : XPEN), k, { x: x }); });
+    }
+    if (bestK == null) return { legs: [], direct: direct };
+    var steps = [], k2 = bestK, start = null;
+    while (k2 != null) { var pr = prev[k2]; if (pr.via.start) start = pr.via.start; else steps.unshift(pr.via); k2 = pr.k; }
+    var legs = [], cur = null, walkFirst = null;
+    steps.forEach(function (v) {
+      if (v.x) { if (cur) cur.walk = v.x; else walkFirst = v.x; cur = null; return; }
+      if (!cur || cur.l !== v.l) {
+        cur = { l: v.l, lines: v.e.lines.slice(), dir: v.e.dir, nodes: [v.from] };
+        legs.push(cur);
+      }
+      cur.nodes.push(v.e.to);
+      cur.lines = cur.lines.filter(function (x) { return v.e.lines.indexOf(x) >= 0; });
+    });
+    legs.forEach(function (lg) {
+      var a = lg.nodes[lg.nodes.length - 1], b = lg.nodes[lg.nodes.length - 2];
+      lg.arr = nbNames(a.g.L).indexOf(b.st.n) >= 0 ? 1 : -1;
+    });
+    if (walkFirst) start = { m: (start ? start.m : 0) + walkFirst.m };
+    return { legs: legs, start: start, direct: direct };
+  }
+
+  // ------------------------------------------------------------ trip rendering
+  var FROM = null, tripSel = null, lastTrip = null;
+  function termini(g, dir, lines) {
+    var out = [];
+    g.d.forEach(function (d) {
+      if (d.dir !== dir || !d.l.some(function (l) { return lines.indexOf(l) >= 0; })) return;
+      d.to.forEach(function (nm) {
+        var ss = BYNAME[nm];
+        if (ss && !ss.some(function (x) { return x.lines.some(function (l) { return lines.indexOf(l) >= 0; }); })) return;
+        if (out.indexOf(nm) < 0) out.push(nm);
+      });
+    });
+    return out;
+  }
+  // last station of line l, following it from n0 through n1
+  function lineEnd(n0, n1, l) {
+    for (var guard = 0; guard < 120; guard++) {
+      var nx = null;
+      n1.adj.forEach(function (e) { if (!nx && e.lines.indexOf(l) >= 0 && e.to.st !== n0.st) nx = e.to; });
+      if (!nx) break;
+      n0 = n1; n1 = nx;
+    }
+    return n1.st.n;
+  }
+  function legHTML(lg, i, legs, dest, isStationDest) {
+    var b = lg.nodes[0], a = lg.nodes[lg.nodes.length - 1], g = a.g;
+    var next = legs[i + 1];
+    var sameNode = next && !lg.walk && next.nodes[0] === a;
+    // exits reachable from the arrival platform
+    var allowed = g.ex.map(function (e, j) { return j; });
+    g.d.forEach(function (d) { if (d.dir === lg.arr && d.x && d.x.length && d.l.some(function (l) { return lg.lines.indexOf(l) >= 0; })) allowed = d.x.slice(); });
+    var sel = null, chips = "";
+    if (sameNode) sel = null;
+    else if (lg.walk) {
+      var tg = lg.walk.to.g, bd = Infinity;
+      allowed.forEach(function (j) { var d = exitGap({ ex: [g.ex[j]] }, tg); if (d < bd) { bd = d; sel = j; } });
+    } else if (isStationDest) {
+      sel = tripSel != null && allowed.indexOf(tripSel) >= 0 ? tripSel : allowed[0];
+      if (allowed.length > 1) {
+        chips = '<div class="exitpick" role="radiogroup" aria-label="' + t("pick") + '">' + allowed.map(function (j) {
+          return '<button type="button" class="xchip" role="radio" aria-checked="' + (j === sel) + '" data-trip="' + j + '"><span><span class="xname">' + esc(g.ex[j].n) + "</span></span></button>";
+        }).join("") + "</div>";
+      }
+    } else {
+      var bd2 = Infinity;
+      allowed.forEach(function (j) { var d = exitDist(g.ex[j], dest.lat, dest.lon); if (d < bd2) { bd2 = d; sel = j; } });
+    }
+    var tos = termini(b.g, lg.dir, lg.lines);
+    if (!tos.length) lg.lines.forEach(function (l) { var nm = lineEnd(lg.nodes[0], lg.nodes[1], l); if (tos.indexOf(nm) < 0) tos.push(nm); });
+    var n = lg.nodes.length - 1;
+    var col = LINE_COLOR[lg.lines[0]] || stationColor(b.st);
+    var html = '<li class="card leg"><div class="card-head"><span class="mode" style="background:' + col + '">' + SYS[b.st.s].letter + "</span>" +
+      '<div class="card-title"><h3>' + esc(b.st.n) + '</h3><div class="card-meta">' + sysName(b.st.s) + "</div></div></div>";
+    html += '<div class="group">' + chips + '<ul class="dirs"><li class="dir"><div class="dir-top"><div class="dir-text">' +
+      '<div class="dir-from">' + t("toCap") + " <b>" + esc(tos.join(" / ")) + '</b><span class="dir-lines">' + lg.lines.map(badge).join("") + "</span></div>" +
+      '<div class="dir-to">' + t("offAt") + " <b>" + esc(a.st.n) + "</b> · " + n + " " + (n === 1 ? t("stop") : t("stops")) + "</div></div>";
+    if (sel != null) {
+      var e = g.ex[sel];
+      html += '<div class="answer"><span class="ans">' + answerFor(e.t * lg.arr).text + "</span></div></div>" + trainSVG(lg.arr, e.t);
+    } else {
+      html += "</div>";
+    }
+    html += "</li></ul></div></li>";
+    if (!next && lg.walk && lg.walk.to.st !== a.st) {
+      html += '<li class="step">' + t("walkTo") + " <b>" + esc(lg.walk.to.st.n) + "</b> · " + t("approx") + " " + walkMin(lg.walk.m) + " " + t("walk") + "</li>";
+    }
+    if (next) {
+      if (lg.walk && lg.walk.to.st !== a.st) {
+        html += '<li class="step">' + t("walkTo") + " <b>" + esc(lg.walk.to.st.n) + "</b> · " + t("approx") + " " + walkMin(lg.walk.m) + " " + t("walk") + "</li>";
+      } else {
+        html += '<li class="step">' + t("changeTo") + " " + next.lines.map(badge).join("") + " " + t("here") + "</li>";
+      }
+    }
+    return html;
+  }
+  function renderTrip(destPlace, destSt) {
+    var dest = destSt ? { st: destSt, lat: destSt.ll[0], lon: destSt.ll[1] } : destPlace;
+    var title = destSt ? destSt.n : destPlace.name;
+    var html = '<div class="dest"><div class="kicker">' + t("trip") + "</div><h2>" + esc(title) + "</h2>";
+    var trip = planTrip(FROM, dest);
+    lastTrip = trip;
+    var sub = t("fromW") + " " + esc(FROM.name);
+    if (trip.legs.length) {
+      var ch = trip.legs.length - 1;
+      sub = sub.charAt(0).toUpperCase() + sub.slice(1) + " · " + (ch ? ch + " " + (ch === 1 ? t("change") : t("changes")) : t("direct")) +
+        ' · <button type="button" class="linkbtn" data-showmap>' + t("showMap") + "</button>";
+    } else sub = sub.charAt(0).toUpperCase() + sub.slice(1);
+    html += '<div class="dest-sub">' + sub + "</div></div>";
+    if (!trip.legs.length) {
+      html += '<p class="empty">' + (trip.direct < 120 ? t("same") : trip.direct < 4000 ? t("walkBest") + " " + walkMin(trip.direct) + " " + t("walkNear2") : t("noRoute")) + "</p>";
+      var isl = destSt ? null : islandOf(dest.lat, dest.lon);
+      if (isl && isl.tip) html += '<p class="warn">' + t(isl.tip) + "</p>";
+    } else {
+      if (trip.direct < 1100) html += '<p class="warn">' + t("walkNear") + " " + walkMin(trip.direct) + " " + t("walkNear2") + "</p>";
+      html += '<ol class="legs">';
+      if (trip.start && trip.start.m > 150) html += '<li class="step">' + t("walkTo") + " <b>" + esc(trip.legs[0].nodes[0].st.n) + "</b> · " + fmtDist(walkM(trip.start.m)) + "</li>";
+      trip.legs.forEach(function (lg, i) { html += legHTML(lg, i, trip.legs, dest, !!destSt); });
+      html += "</ol>";
+    }
+    return html;
+  }
+
+  // ------------------------------------------------------------ SL app
+  function slHref() {
+    var ua = navigator.userAgent || "";
+    if (/android/i.test(ua)) return "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.sl.SLBiljetter;S.browser_fallback_url=" +
+      encodeURIComponent("https://play.google.com/store/apps/details?id=com.sl.SLBiljetter") + ";end";
+    if (/iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return "https://apps.apple.com/se/app/id918418291";
+    return "https://sl.se/";
+  }
+  function slHTML() {
+    return '<a class="slbtn" href="' + esc(slHref()) + '" rel="noopener">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="2 2"/></svg>' +
+      t("sl") + "</a>";
+  }
+
+  // ------------------------------------------------------------ map of the whole rail system
+  var mapEl = $("#mapView"), cv = $("#mapCanvas"), cx2 = cv.getContext("2d");
+  var KX = 111.32 * Math.cos(59.33 * Math.PI / 180), KY = 111.32;
+  function proj(st) { return [(st.ll[1] - 18.07) * KX, -(st.ll[0] - 59.33) * KY]; }
+  var COL_ORDER = ["var(--pendel)", "var(--red)", "var(--green)", "var(--blue)", "var(--roslag)", "var(--saltsjo)", "var(--tvar)", "var(--lidingo)", "var(--nockeby)"];
+  var MAP_E = [];
+  (function () {
+    var m = {};
+    NODES.forEach(function (n) {
+      n.adj.forEach(function (e) {
+        var a = n.st, b = e.to.st, pa = proj(a), pb = proj(b);
+        if (pa[0] > pb[0] || (pa[0] === pb[0] && pa[1] > pb[1])) { var s0 = a; a = b; b = s0; }
+        var k = a.id + "|" + b.id;
+        var E = m[k] || (m[k] = { a: a, b: b, cols: [] });
+        e.lines.forEach(function (l) { var c = LINE_COLOR[l]; if (c && E.cols.indexOf(c) < 0) E.cols.push(c); });
+      });
+    });
+    Object.keys(m).forEach(function (k) { m[k].cols.sort(function (x, y) { return COL_ORDER.indexOf(x) - COL_ORDER.indexOf(y); }); MAP_E.push(m[k]); });
+  })();
+  var PROJ = {};
+  STATIONS.forEach(function (st) { PROJ[st.id] = proj(st); });
+  var view = { x: 0, y: 0, k: 12 }, W = 0, H = 0, dpr = 1, colors = {}, mapRoute = null, drawQ = false;
+  function cssv(v) {
+    var m = /var\((--[\w-]+)\)/.exec(v);
+    return m ? getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim() : v;
+  }
+  function S(id) { var p = PROJ[id]; return [(p[0] - view.x) * view.k + W / 2, (p[1] - view.y) * view.k + H / 2]; }
+  function fitTo(list, pad) {
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    list.forEach(function (st) { var p = PROJ[st.id]; x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+    view.x = (x0 + x1) / 2; view.y = (y0 + y1) / 2;
+    view.k = Math.max(2, Math.min(220, Math.min((W - pad * 2) / Math.max(0.5, x1 - x0), (H - pad * 2) / Math.max(0.5, y1 - y0))));
+  }
+  function sizeMap() {
+    dpr = window.devicePixelRatio || 1;
+    W = mapEl.clientWidth; H = mapEl.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  }
+  function seg(p, q, off, col, lw, dash) {
+    var dx = q[0] - p[0], dy = q[1] - p[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L * off, ny = dx / L * off;
+    cx2.beginPath(); cx2.moveTo(p[0] + nx, p[1] + ny); cx2.lineTo(q[0] + nx, q[1] + ny);
+    cx2.strokeStyle = col; cx2.lineWidth = lw; cx2.setLineDash(dash || []); cx2.stroke();
+  }
+  function onScreen(p, q) {
+    return !(Math.max(p[0], q[0]) < -20 || Math.min(p[0], q[0]) > W + 20 || Math.max(p[1], q[1]) < -20 || Math.min(p[1], q[1]) > H + 20);
+  }
+  function drawMap() {
+    drawQ = false;
+    var c = cx2;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.fillStyle = colors.bg; c.fillRect(0, 0, W, H);
+    c.lineCap = "round";
+    var lw = Math.max(2.5, Math.min(6, view.k * 0.09));
+    var onRoute = {};
+    if (mapRoute) mapRoute.forEach(function (r) { onRoute[r.a.id] = onRoute[r.b.id] = 1; });
+    c.globalAlpha = mapRoute ? 0.28 : 1;
+    MAP_E.forEach(function (E) {
+      var p = S(E.a.id), q = S(E.b.id);
+      if (!onScreen(p, q)) return;
+      var n = E.cols.length;
+      E.cols.forEach(function (col, i) { seg(p, q, (i - (n - 1) / 2) * lw, colors[col] || (colors[col] = cssv(col)), lw); });
+    });
+    c.globalAlpha = 1;
+    if (mapRoute) mapRoute.forEach(function (r) {
+      var col = r.col ? colors[r.col] || (colors[r.col] = cssv(r.col)) : colors.muted;
+      seg(S(r.a.id), S(r.b.id), 0, col, r.col ? lw * 1.7 : lw, r.col ? null : [2, lw * 1.6]);
+    });
+    c.setLineDash([]);
+    // stations
+    var r0 = Math.max(2.2, lw * 0.62), pts = [];
+    STATIONS.forEach(function (st) {
+      var p = S(st.id);
+      if (p[0] < -30 || p[0] > W + 30 || p[1] < -30 || p[1] > H + 30) return;
+      var hi = !mapRoute || onRoute[st.id];
+      c.globalAlpha = hi ? 1 : 0.4;
+      c.beginPath(); c.arc(p[0], p[1], onRoute[st.id] ? r0 * 1.35 : r0, 0, 6.2832);
+      c.fillStyle = colors.surface; c.fill(); c.lineWidth = 1.6; c.strokeStyle = colors.ink; c.stroke();
+      pts.push({ st: st, p: p, pr: (onRoute[st.id] ? 100 : 0) + st.lines.length + (st.g.length > 1 ? 4 : 0) + (st.s === "metro" || st.s === "pendel" ? 2 : 0) });
+    });
+    c.globalAlpha = 1;
+    // labels, most important first, skipping any that would overlap
+    pts.sort(function (a, b) { return b.pr - a.pr; });
+    c.font = "700 12.5px " + colors.font;
+    c.textBaseline = "middle";
+    var boxes = [];
+    pts.forEach(function (o) { boxes.push([o.p[0] - r0 - 1, o.p[1] - r0 - 1, o.p[0] + r0 + 1, o.p[1] + r0 + 1]); });
+    function free(b) { for (var i = 0; i < boxes.length; i++) { var z = boxes[i]; if (b[0] < z[2] && b[2] > z[0] && b[1] < z[3] && b[3] > z[1]) return false; } return true; }
+    pts.forEach(function (o) {
+      if (mapRoute && !onRoute[o.st.id] && view.k < 40) return;
+      var w = c.measureText(o.st.n).width, x = o.p[0], y = o.p[1], g = r0 + 4;
+      var right = [x + g, y - 8, x + g + w, y + 8], left = [x - g - w, y - 8, x - g, y + 8];
+      var b = free(right) ? right : free(left) ? left : null;
+      if (!b) return;
+      boxes.push([b[0] - 2, b[1], b[2] + 2, b[3]]);
+      c.globalAlpha = !mapRoute || onRoute[o.st.id] ? 1 : 0.55;
+      c.lineWidth = 3.5; c.strokeStyle = colors.bg; c.lineJoin = "round";
+      c.strokeText(o.st.n, b[0], y); c.fillStyle = colors.ink; c.fillText(o.st.n, b[0], y);
+    });
+    c.globalAlpha = 1;
+  }
+  function redraw() { if (!drawQ) { drawQ = true; requestAnimationFrame(drawMap); } }
+  function routeSegments(trip) {
+    if (!trip || !trip.legs || !trip.legs.length) return null;
+    var out = [];
+    trip.legs.forEach(function (lg, i) {
+      for (var j = 1; j < lg.nodes.length; j++) out.push({ a: lg.nodes[j - 1].st, b: lg.nodes[j].st, col: LINE_COLOR[lg.lines[0]] });
+      if (lg.walk && lg.walk.to.st !== lg.nodes[lg.nodes.length - 1].st) out.push({ a: lg.nodes[lg.nodes.length - 1].st, b: lg.walk.to.st, col: null });
+    });
+    return out;
+  }
+  function openMap(withRoute) {
+    colors = { bg: cssv("var(--bg)"), surface: cssv("var(--surface)"), ink: cssv("var(--ink)"), muted: cssv("var(--muted)"), font: cssv("var(--font-body)") };
+    mapRoute = withRoute && FROM && current ? routeSegments(lastTrip) : null;
+    mapEl.hidden = false;
+    document.documentElement.style.overflow = "hidden";
+    sizeMap();
+    if (mapRoute) {
+      var list = [];
+      mapRoute.forEach(function (r) { list.push(r.a, r.b); });
+      fitTo(list, 56);
+    } else {
+      fitTo(STATIONS.filter(function (st) { return st.s === "metro"; }), 24);
+    }
+    drawMap();
+    try { history.pushState({ febMap: 1 }, ""); } catch (e) { /* ignore */ }
+    $("#mapClose").focus({ preventScroll: true });
+  }
+  function closeMap(fromPop) {
+    if (mapEl.hidden) return;
+    mapEl.hidden = true;
+    document.documentElement.style.overflow = "";
+    if (!fromPop && history.state && history.state.febMap) { try { history.back(); } catch (e) { /* ignore */ } }
+  }
+  window.addEventListener("popstate", function () { closeMap(true); });
+  window.addEventListener("resize", function () { if (!mapEl.hidden) { var cx0 = view.x, cy0 = view.y; sizeMap(); view.x = cx0; view.y = cy0; drawMap(); } });
+  $("#mapBtn").addEventListener("click", function () { openMap(true); });
+  $("#mapClose").addEventListener("click", function () { closeMap(false); });
+  mapEl.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeMap(false); });
+  function zoomAt(f, sx, sy) {
+    var k2 = Math.max(2, Math.min(400, view.k * f));
+    var wx = view.x + (sx - W / 2) / view.k, wy = view.y + (sy - H / 2) / view.k;
+    view.k = k2;
+    view.x = wx - (sx - W / 2) / k2; view.y = wy - (sy - H / 2) / k2;
+    redraw();
+  }
+  cv.addEventListener("wheel", function (ev) { ev.preventDefault(); var r = cv.getBoundingClientRect(); zoomAt(Math.exp(-ev.deltaY * 0.0022), ev.clientX - r.left, ev.clientY - r.top); }, { passive: false });
+  var ptrs = {}, tap = null, pinch = null, lastTap = 0;
+  function pts2() { return Object.keys(ptrs).map(function (k) { return ptrs[k]; }); }
+  cv.addEventListener("pointerdown", function (ev) {
+    cv.setPointerCapture(ev.pointerId);
+    var r = cv.getBoundingClientRect();
+    ptrs[ev.pointerId] = { x: ev.clientX - r.left, y: ev.clientY - r.top };
+    var P = pts2();
+    if (P.length === 1) tap = { x: P[0].x, y: P[0].y, t: Date.now() };
+    else { tap = null; pinch = { d: Math.hypot(P[0].x - P[1].x, P[0].y - P[1].y), mx: (P[0].x + P[1].x) / 2, my: (P[0].y + P[1].y) / 2 }; }
+  });
+  cv.addEventListener("pointermove", function (ev) {
+    var o = ptrs[ev.pointerId];
+    if (!o) return;
+    var r = cv.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+    var P = pts2();
+    if (P.length === 1) {
+      view.x -= (x - o.x) / view.k; view.y -= (y - o.y) / view.k;
+      o.x = x; o.y = y;
+      if (tap && Math.hypot(x - tap.x, y - tap.y) > 8) tap = null;
+      redraw();
+    } else if (P.length === 2 && pinch) {
+      o.x = x; o.y = y;
+      var d = Math.hypot(P[0].x - P[1].x, P[0].y - P[1].y), mx = (P[0].x + P[1].x) / 2, my = (P[0].y + P[1].y) / 2;
+      view.x -= (mx - pinch.mx) / view.k; view.y -= (my - pinch.my) / view.k;
+      zoomAt(d / (pinch.d || 1), mx, my);
+      pinch = { d: d, mx: mx, my: my };
+    }
+  });
+  function ptrEnd(ev) {
+    if (!ptrs[ev.pointerId]) return;
+    delete ptrs[ev.pointerId];
+    if (pts2().length < 2) pinch = null;
+    if (tap && ev.type === "pointerup" && Date.now() - tap.t < 400) {
+      var now = Date.now();
+      var hit = null, hd = 22;
+      STATIONS.forEach(function (st) { var p = S(st.id), d = Math.hypot(p[0] - tap.x, p[1] - tap.y); if (d < hd) { hd = d; hit = st; } });
+      if (hit) { closeMap(false); setTimeout(function () { choose({ k: "st", st: hit, name: hit.n }); }, 0); }
+      else if (now - lastTap < 320) zoomAt(2, tap.x, tap.y);
+      lastTap = now;
+    }
+    tap = null;
+  }
+  cv.addEventListener("pointerup", ptrEnd);
+  cv.addEventListener("pointercancel", ptrEnd);
+
   // ------------------------------------------------------------ routing
   function routeFromHash(fromLoad) {
     var h = (location.hash || "").replace(/^#/, "");
@@ -1193,6 +1780,7 @@ body.home footer { display: none; }
     LANG = b.getAttribute("data-lang");
     store0("feb.lang", LANG);
     applyStatic();
+    if (FROM && FROM.k === "me") { FROM.name = t("me"); fEl.value = FROM.name; }
     if (current) { var keepSel = selState, keepOpen = openState; render(); selState = keepSel; openState = keepOpen; }
     renderChips();
     if (!sugEl.hidden) update();
