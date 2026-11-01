@@ -1296,7 +1296,21 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
     navigator.geolocation.getCurrentPosition(function (pos) {
       locBtn.disabled = false; $("#locText").textContent = t("me");
       activeEl = fEl;
-      setFrom({ k: "me", name: t("me"), lat: pos.coords.latitude, lon: pos.coords.longitude });
+      var lat = pos.coords.latitude, lon = pos.coords.longitude;
+      setFrom({ k: "me", name: t("me"), lat: lat, lon: lon });
+      var me = FROM;
+      // swap "Min plats" for the street address once reverse geocoding answers
+      fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&accept-language=" + LANG +
+        "&lat=" + lat + "&lon=" + lon).then(function (r) { return r.json(); }).then(function (d) {
+        var a = d && d.address;
+        if (!a || FROM !== me) return;
+        var street = a.road || a.pedestrian || a.footway || a.path || a.square || "";
+        var name = street ? street + (a.house_number ? " " + a.house_number : "") : (d.name || a.neighbourhood || a.suburb || "");
+        if (!name) return;
+        me.name = name; me.addr = name;
+        fEl.value = name;
+        if (current) render();
+      }).catch(function () { /* keep "Min plats" */ });
     }, function () {
       locBtn.disabled = false; $("#locText").textContent = t("me");
       alert(t("geoFail"));
@@ -1837,7 +1851,7 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
     store0("feb.lang", LANG);
     applyStatic();
     if (!tourEl.hidden) showTour();
-    if (FROM && FROM.k === "me") { FROM.name = t("me"); fEl.value = FROM.name; }
+    if (FROM && FROM.k === "me" && !FROM.addr) { FROM.name = t("me"); fEl.value = FROM.name; }
     if (current) { var keepSel = selState, keepOpen = openState; render(); selState = keepSel; openState = keepOpen; }
     renderChips();
     if (!sugEl.hidden) update();
