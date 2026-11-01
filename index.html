@@ -1377,7 +1377,7 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
       NODES.push(n); NODE_OF[st.id + ":" + gi] = n;
     });
   });
-  var SPEED = { metro: 600, pendel: 900 }; // metres per minute, roughly, stops included below
+  var SPEED = { metro: 850, pendel: 900 }; // metres per minute, roughly, stops included below
   NODES.forEach(function (n) {
     ["L", "R"].forEach(function (side) {
       nbNames(n.g[side]).forEach(function (nm) {
@@ -1414,6 +1414,8 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
   var LIDX = {}, NL = 0;
   STATIONS.forEach(function (st) { st.lines.forEach(function (l) { if (LIDX[l] == null) LIDX[l] = NL++; }); });
   var FOOT = 63, XPEN = 8; // state for "on foot"; minutes added per change
+  // average wait when boarding (about half the headway): the metro runs far more often than the others
+  var WAIT = { metro: 2.5 }, WAIT0 = 5;
 
   // minutes on foot to or from a station; long walks count extra so a short ride wins over a long walk
   function accessC(m) { return walkMin(m) + Math.max(0, m - 500) / 80; }
@@ -1479,7 +1481,7 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
       n.adj.forEach(function (e) {
         e.lines.forEach(function (l) {
           var lj = LIDX[l];
-          relax(e.to.i * 64 + lj, c + e.c + (li === FOOT ? 0 : lj === li ? 0 : XPEN), k, { e: e, l: l, from: n });
+          relax(e.to.i * 64 + lj, c + e.c + (li === FOOT ? (WAIT[n.st.s] != null ? WAIT[n.st.s] : WAIT0) : lj === li ? 0 : XPEN), k, { e: e, l: l, from: n });
         });
       });
       n.xf.forEach(function (x) { relax(x.to.i * 64 + FOOT, c + x.c + (li === FOOT ? 0 : XPEN), k, { x: x }); });
