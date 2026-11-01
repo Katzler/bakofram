@@ -1598,9 +1598,20 @@ body:not(.home) .brand h1 { font-size: 24px; padding-top: 14px; }
     var ua = navigator.userAgent || "";
     if (/android/i.test(ua)) return "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.sl.SLBiljetter;S.browser_fallback_url=" +
       encodeURIComponent("https://play.google.com/store/apps/details?id=com.sl.SLBiljetter") + ";end";
-    if (/iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return "https://apps.apple.com/se/app/id918418291";
+    if (isIOS()) return "sl://";
     return "https://sl.se/";
   }
+  var SL_STORE_IOS = "https://apps.apple.com/se/app/id918418291";
+  function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
+  // iOS: open the app via its URL scheme; if nothing happened (app not installed), go to the App Store instead
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest(".slbtn");
+    if (!a || !isIOS()) return;
+    ev.preventDefault();
+    var t0 = Date.now();
+    location.href = "sl://";
+    setTimeout(function () { if (!document.hidden && Date.now() - t0 < 2500) location.href = SL_STORE_IOS; }, 1500);
+  });
   function slHTML() {
     return '<a class="slbtn" href="' + esc(slHref()) + '" rel="noopener">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="2 2"/></svg>' +
